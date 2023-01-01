@@ -1,0 +1,1 @@
+Use [Citation Style Format](https://citation-file-format.github.io/cff-initializer-javascript/#/)? Mentioned in [Packaging](https://github.com/UCL/rsd-engineeringcourse/blob/main/ch04packaging/03Packaging.ipynb) lecture notes

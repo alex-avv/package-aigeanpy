@@ -42,58 +42,13 @@ def pixel_to_earth(x, y, offset, resolution):
     return xcoords, ycoords
 
 
-def get_satmap(Parameters: Parameters_Data_Type) -> Returns_Data_Type:
+def get_satmap(Parameters: Parameters_Data_Type) -> SatMap:
     '''
     Docstring
     '''
 
     ...
     raise NotImplementedError
-
-
-class Lir:
-    '''
-    Docstring
-    '''
-
-    # Extract Lir data (stored in .asdf file format) using Strategy Pattern
-    def extract_data(self, Parameters: Parameters_Data_Type) -> Returns_Data_Type:
-        '''
-        Docstring
-        '''
-
-        ...
-        raise NotImplementedError
-
-
-class Manannan:
-    '''
-    Docstring
-    '''
-
-    # Extract Manannan data (stored in .hdf5 file format) using Strategy Pattern
-    def extract_data(self, Parameters: Parameters_Data_Type) -> Returns_Data_Type:
-        '''
-        Docstring
-        '''
-
-        ...
-        raise NotImplementedError
-
-
-class Fand:
-    '''
-    Docstring
-    '''
-
-    # Extract Fand data [stored in .zipfile(.npy, .json) file format] using Strategy Pattern
-    def extract_data(self, Parameters: Parameters_Data_Type) -> Returns_Data_Type:
-        '''
-        Docstring
-        '''
-
-        ...
-        raise NotImplementedError
 
 
 class SatMap:

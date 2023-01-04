@@ -1,10 +1,15 @@
-def earth_to_pixel(Parameters: Parameters_Data_Type) -> Returns_Data_Type:
-    '''
-    Docstring
-    '''
+def earth_to_pixel(x, y, offset, resolution):
+    # offset is the pixel distance from coordinate xy top left to the origin
+    offset = (offset[0] // resolution, offset[1] // resolution)
 
-    ...
-    raise NotImplementedError
+    # pixel coords, change earth coords to the pixel coords by dividing resolution
+    # and move the coords to the origin
+    pixel_xcoords = (x[0] // resolution-offset[0], x[1] // resolution-offset[0])
+    # Filp the Y-axis to achieve: In the top-left corner and positive y-values going downwards. 
+    pixel_ycoords = (abs(y[1] // resolution-offset[1]), abs(y[0] // resolution-offset[1]))
+
+    # return pixel coords, type=tuple
+    return (pixel_xcoords, pixel_ycoords)
 
 
 def pixel_to_earth(Parameters: Parameters_Data_Type) -> Returns_Data_Type:
@@ -71,9 +76,6 @@ class Fand:
 
 
 class SatMap:
-    '''
-    Docstring
-    '''
     def __init__(self, meta, data, shape, fov, centre):
         self.meta = meta
         self.data = data

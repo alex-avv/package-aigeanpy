@@ -74,32 +74,12 @@ class SatMap:
     '''
     Docstring
     '''
-
-    def __init__(self, Parameters):
-        if File_Is_From_Lir:
-            self.data, self.meta = Lir().extract_data(Parameters)
-
-        elif File_Is_From_Manannan:
-            self.data, self.meta = Manannan().extract_data(Parameters)
-
-        elif File_Is_From_Fand:
-            self.data, self.meta = Fand().extract_data(Parameters)   
-
-        else:
-            raise ValueError("File couldn't be linked to Lir, Manannan or Fand imagers")
-
-        # self.data member variable – npy array
-        # self.meta member variable – dictionary
-
-        # self.fov member variable – tuple
-        # self.centre member variable – tuple
-        # self.shape member variable – tuple
-
-        # self.instrument member variable?
-        # self.resolution member variable?
-        # self.day member variable?
-        # self.observatory member variable?
-        raise NotImplementedError
+    def __init__(self, meta, data, shape, fov, centre):
+        self.meta = meta
+        self.data = data
+        self.shape = shape
+        self.fov = fov
+        self.centre = centre
 
     def __add__(self, Parameters: Parameters_Data_Type) -> Returns_Data_Type:
         # For collating the two SatMap objects’ data?

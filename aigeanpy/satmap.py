@@ -1,15 +1,26 @@
 def earth_to_pixel(x, y, offset, resolution):
-    # offset is the pixel distance from coordinate xy top left to the origin
+    """Change earth coordinate to pixel coordinate
+
+    Args:
+        x (tuple): earth coordinate, xcoords
+        y (tuple): earth coordinate, ycoords
+        offset (tuple): earth distance from coordinate xy top left to the origin(0,0)
+        resolution (int): data resolution
+
+    Returns:
+        tuple: pixel coordinate, xcoords
+        tuple: pixel coordinate, ycoords. Positive y-values going downwards
+    """    
+
+    # change to the pixel distance
     offset = (offset[0] // resolution, offset[1] // resolution)
 
-    # pixel coords, change earth coords to the pixel coords by dividing resolution
-    # and move the coords to the origin
+    # change earth coords to the pixel coords by dividing resolution and move the coords to the origin
     pixel_xcoords = (x[0] // resolution-offset[0], x[1] // resolution-offset[0])
     # Filp the Y-axis to achieve: In the top-left corner and positive y-values going downwards. 
     pixel_ycoords = (abs(y[1] // resolution-offset[1]), abs(y[0] // resolution-offset[1]))
 
-    # return pixel coords, type=tuple
-    return (pixel_xcoords, pixel_ycoords)
+    return pixel_xcoords, pixel_ycoords
 
 
 def pixel_to_earth(Parameters: Parameters_Data_Type) -> Returns_Data_Type:

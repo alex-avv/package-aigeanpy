@@ -23,3 +23,5 @@ def mosaic(Parameters: Parameters_Data_Type) -> Returns_Data_Type:
 
     ...
     raise NotImplementedError
+
+# Small change in command module

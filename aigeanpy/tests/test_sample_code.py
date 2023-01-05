@@ -5,7 +5,8 @@ import yaml
 from pytest import mark, raises
 
 TEST_DIR = Path(__file__).parent
-with open(TEST_DIR/'fixtures/fixture_example.yml', 'r', encoding="utf-8") as ymlFixtures:
+with open(TEST_DIR/'fixtures/fixture_example.yml', 'r',
+          encoding="utf-8") as ymlFixtures:
     dFixtures = yaml.safe_load(ymlFixtures)
 
 
@@ -14,7 +15,8 @@ with open(TEST_DIR/'fixtures/fixture_example.yml', 'r', encoding="utf-8") as yml
 def test_function_1_cases_12(dCase):
     dProperties = list(dCase.values())[0]
     parameters = dProperties['parameters']
-    expected_error_message_or_value = dProperties['expected_error_message_or_value']
+    expected_error_message_or_value = (dProperties
+                                       ['expected_error_message_or_value'])
 
     with raises(NotImplementedError) as exception:
         raise NotImplementedError("String_or_Value")
@@ -26,7 +28,8 @@ def test_function_1_cases_12(dCase):
 def test_function_1_cases_34(dCase):
     dProperties = list(dCase.values())[0]
     parameters = dProperties['parameters']
-    expected_error_message_or_value = dProperties['expected_error_message_or_value']
+    expected_error_message_or_value = (dProperties
+                                       ['expected_error_message_or_value'])
 
     # import function_1 instead of below
     def function_1(parameters):

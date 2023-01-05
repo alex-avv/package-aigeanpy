@@ -13,7 +13,7 @@ jobs:
   test:
     # Multiple platforms have been disabled because Windows and OSx needs more credits than what we have.
     # Don't use them during class or the assignment
-    name: py${{ matrix.python-version }} # ${{ matrix.platform }}
+    name: testing py${{ matrix.python-version }} # ${{ matrix.platform }}
     runs-on: ubuntu-latest # ${{ matrix.platform }}
     strategy:
       matrix:
@@ -38,3 +38,34 @@ jobs:
           pip install .
       - name: Run tests
         run: pytest --cov=./
+
+  lint:
+    name: linting py${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+    # Only runs test job on main branch
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      # Checkout the repository and setups the machine to use python
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install linting dependencies
+        run: |
+          pip install pylint pycodestyle
+      - name: Install package
+        run: |
+          pip install .
+      - name: Run pylint
+        run: |
+          # Disabling missing-module-docstring, unnecessary-ellipsis, and too-few-public-methods errors
+          pylint aigeanpy --disable C0114,R0903,W2301
+      - name: Run pycodestyle
+        run: |
+          pycodestyle aigeanpy

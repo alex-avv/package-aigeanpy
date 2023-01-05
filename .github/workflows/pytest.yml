@@ -1,6 +1,6 @@
 name: Installation, test and coverage
 # Only run workflow when there are pushes or pull requests to the main branch.
-# This was done due to the limited number of GitHub Actions credits available
+# This was done due to our limited number of GitHub Actions credits
 on:
   push:
     branches:
@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         # platform: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: [3.9, 3.11]
+        python-version: [3.9]
     # Only runs test job on main branch
     if: github.ref == 'refs/heads/main'
 
@@ -33,8 +33,8 @@ jobs:
       - name: Install testing dependencies
         run: |
           pip install pytest pytest-cov
-      # - name: Install package
-      #   run: |
-      #     pip install .
+      - name: Install package
+        run: |
+          pip install .
       - name: Run tests
         run: pytest --cov=./

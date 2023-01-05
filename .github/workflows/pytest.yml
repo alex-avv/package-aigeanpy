@@ -1,0 +1,40 @@
+name: Installation, test and coverage
+# Only run workflow when there are pushes or pull requests to the main branch.
+# This was done due to the limited number of GitHub Actions credits available
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - 'main'
+
+jobs:
+  test:
+    # Multiple platforms have been disabled because Windows and OSx needs more credits than what we have.
+    # Don't use them during class or the assignment
+    name: py${{ matrix.python-version }} # ${{ matrix.platform }}
+    runs-on: ubuntu-latest # ${{ matrix.platform }}
+    strategy:
+      matrix:
+        # platform: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: [3.9, 3.11]
+    # Only runs test job on main branch
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      # Checkout the repository and setups the machine to use python
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install testing dependencies
+        run: |
+          pip install pytest pytest-cov
+      # - name: Install package
+      #   run: |
+      #     pip install .
+      - name: Run tests
+        run: pytest --cov=./

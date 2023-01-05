@@ -1,6 +1,6 @@
 name: Installation, test and coverage
 # Only run workflow when there are pushes or pull requests to the main branch.
-# This was done due to our limited number of GitHub Actions credits
+# This was done due to the limited number of GitHub Actions credits
 on:
   push:
     branches:
@@ -13,7 +13,7 @@ jobs:
   test:
     # Multiple platforms have been disabled because Windows and OSx needs more credits than what we have.
     # Don't use them during class or the assignment
-    name: testing py${{ matrix.python-version }} # ${{ matrix.platform }}
+    name: py${{ matrix.python-version }} # ${{ matrix.platform }}
     runs-on: ubuntu-latest # ${{ matrix.platform }}
     strategy:
       matrix:
@@ -37,7 +37,7 @@ jobs:
         run: |
           pip install .
       - name: Run tests
-        run: pytest --cov=./
+        run: pytest aigeanpy --doctest-modules --cov=./
 
       - name: Install linting dependencies
         run: |

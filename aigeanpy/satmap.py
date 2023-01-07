@@ -1,4 +1,4 @@
-def earth_to_pixel(Parameters: Parameters_Data_Type) -> Returns_Data_Type:
+def earth_to_pixel(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
     '''
     Docstring
     '''
@@ -7,7 +7,7 @@ def earth_to_pixel(Parameters: Parameters_Data_Type) -> Returns_Data_Type:
     raise NotImplementedError
 
 
-def pixel_to_earth(Parameters: Parameters_Data_Type) -> Returns_Data_Type:
+def pixel_to_earth(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
     '''
     Docstring
     '''
@@ -16,7 +16,7 @@ def pixel_to_earth(Parameters: Parameters_Data_Type) -> Returns_Data_Type:
     raise NotImplementedError
 
 
-def get_satmap(Parameters: Parameters_Data_Type) -> Returns_Data_Type:
+def get_satmap(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
     '''
     Docstring
     '''
@@ -31,7 +31,8 @@ class Lir:
     '''
 
     # Extract Lir data (stored in .asdf file format) using Strategy Pattern
-    def extract_data(self, Parameters: Parameters_Data_Type) -> Returns_Data_Type:
+    def extract_data(self, _parameters:
+                     'Parameters_Data_Type') -> 'Returns_Data_Type':
         '''
         Docstring
         '''
@@ -45,8 +46,10 @@ class Manannan:
     Docstring
     '''
 
-    # Extract Manannan data (stored in .hdf5 file format) using Strategy Pattern
-    def extract_data(self, Parameters: Parameters_Data_Type) -> Returns_Data_Type:
+    # Extract Manannan data (stored in .hdf5 file format) using Strategy
+    # Pattern
+    def extract_data(self, _parameters:
+                     'Parameters_Data_Type') -> 'Returns_Data_Type':
         '''
         Docstring
         '''
@@ -60,8 +63,10 @@ class Fand:
     Docstring
     '''
 
-    # Extract Fand data [stored in .zipfile(.npy, .json) file format] using Strategy Pattern
-    def extract_data(self, Parameters: Parameters_Data_Type) -> Returns_Data_Type:
+    # Extract Fand data [stored in .zipfile(.npy, .json) file format] using
+    # Strategy Pattern
+    def extract_data(self, _parameters:
+                     'Parameters_Data_Type') -> 'Returns_Data_Type':
         '''
         Docstring
         '''
@@ -81,15 +86,18 @@ class SatMap:
         self.fov = fov
         self.centre = centre
 
-    def __add__(self, Parameters: Parameters_Data_Type) -> Returns_Data_Type:
+    def __add__(self,
+                _parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
         # For collating the two SatMap objects’ data?
         pass
 
-    def __sub__(self, Parameters: Parameters_Data_Type) -> Returns_Data_Type:
+    def __sub__(self,
+                _parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
         # For subtracting the two SatMap objects’ data?
         pass
 
-    def mosaic(self, Parameters: Parameters_Data_Type) -> Returns_Data_Type:
+    def mosaic(self,
+               _parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
         '''
         Docstring
         '''
@@ -97,7 +105,8 @@ class SatMap:
         ...
         raise NotImplementedError
 
-    def visualise(self, Parameters: Parameters_Data_Type) -> Returns_Data_Type:
+    def visualise(self,
+                  _parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
         '''
         Docstring
         '''
@@ -105,7 +114,7 @@ class SatMap:
         ...
         raise NotImplementedError
 
-    def __str__(self) -> Returns_Data_Type:
+    def __str__(self) -> 'Returns_Data_Type':
         # For printing object information
         # using >>> print(SatMap object)?
         pass

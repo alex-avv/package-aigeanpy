@@ -1,4 +1,5 @@
 import numpy as np
+from skimage import transform
 
 def earth_to_pixel(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
     '''
@@ -182,14 +183,54 @@ class SatMap:
         setmap  = type(self)(meta, data)
         return setmap
 
-    def mosaic(self,
-               _parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
-        '''
-        Docstring
-        '''
+    def mosaic(self,another_satmap,resolution=None,padding=True):
+        """do the more complex object adding
 
-        ...
-        raise NotImplementedError
+        Args:
+            another_satmap (SatMap): another satmap object
+            resolution (int, optional): the resolution of the desired data. Defaults to None.
+            padding (bool, optional): a flag determines whether emtpy space is reserved. Defaults to True.
+
+        Returns:
+            SatMap: a new object that have been added
+        """      
+        # if the resolution is not specified, choose the smaller resolution
+        if resolution == None:
+            resolution = min(self.meta['resolution'], another_satmap.meta['resolution'])
+
+        # rescale the data, and use different function for up-sampling and down-sampling
+        if resolution <self.meta['resolution']:
+            data_self = transform.rescale(self.data, self.meta['resolution']/resolution)
+        else:
+            data_self = transform.downscale_local_mean(self.data, resolution//self.meta['resolution'])
+        if resolution < another_satmap.meta['resolution']:
+            data_another = transform.rescale(another_satmap.data, another_satmap.meta['resolution']/resolution)
+        else:
+            data_another = transform.downscale_local_mean(another_satmap.data, resolution//another_satmap.meta['resolution'])
+
+        # copy the data info from the addend, but update the new resolution
+        meta_self = self.meta.copy()
+        meta_self['resolution'] = resolution
+        # generate a new SatMap object
+        setmap_self  = type(self)(meta_self, data_self)
+
+        # copy the data info from the addend, but update the new resolution
+        meta_another = another_satmap.meta.copy()
+        meta_another['resolution'] = resolution
+        # generate a new SatMap object
+        setmap_another  = type(another_satmap)(meta_another, data_another)
+
+        # if padding, call the __add__ function
+        if padding:
+            setmap = setmap_self + setmap_another
+
+        # if without padding, generate the max non-empty data
+        else:
+            setmap_padding = setmap_self + setmap_another
+            intersect_coords_x = (max(self.meta['xcoords'][0], another_satmap.meta['xcoords'][0]),min(self.meta['xcoords'][1], another_satmap.meta['xcoords'][1]))
+            intersect_coords_y = (max(self.meta['ycoords'][0], another_satmap.meta['ycoords'][0]),min(self.meta['ycoords'][1], another_satmap.meta['ycoords'][1]))
+        
+        return setmap
 
     def visualise(self,
                   _parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':

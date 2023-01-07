@@ -136,10 +136,51 @@ class SatMap:
         setmap  = type(self)(meta, data)
         return setmap
 
-    def __sub__(self,
-                _parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
-        # For subtracting the two SatMap objects’ data?
-        pass
+    def __sub__(self, another_satmap):
+        """do the object subtract
+
+        Args:
+            another_satmap (SatMap): another satmap object
+
+        Raises:
+            ValueError: _description_
+
+        Returns:
+            SatMap: a new object that have been added
+        """     
+        # earth coords of the new object
+        data_coords_x = (max(self.meta['xcoords'][0], another_satmap.meta['xcoords'][0]),min(self.meta['xcoords'][1], another_satmap.meta['xcoords'][1]))
+        data_coords_y = (max(self.meta['ycoords'][0], another_satmap.meta['ycoords'][0]),min(self.meta['ycoords'][1], another_satmap.meta['ycoords'][1]))
+        # earth distance from new object top left to the origin(0,0)
+        offset = (data_coords_x[0],data_coords_y[1])
+        # get resolution from object
+        resolution =  self.meta['resolution']
+        
+        # change earth coords to pixel coords
+        pixel_data_x, pixel_data_y = earth_to_pixel(data_coords_x, data_coords_y, offset, resolution)
+        pixel_self_x, pixel_self_y = earth_to_pixel(self.meta['xcoords'], self.meta['ycoords'], offset, resolution)
+        pixel_another_x, pixel_another_y = earth_to_pixel(another_satmap.meta['xcoords'], another_satmap.meta['ycoords'], offset, resolution)
+
+        # generate empty subtracted data
+        data = np.zeros((pixel_data_y[1]-pixel_data_y[0], pixel_data_x[1]-pixel_data_x[0]))
+        # find the pixel coordinates of the overlaps on the original data
+        self_offset = (max(0,-pixel_self_y[0]), max(0,-pixel_self_x[0]))
+        # import data from origin data into the empty subtracted data
+        data = self.data[self_offset[0]:pixel_data_y[1]+self_offset[0], self_offset[1]:pixel_data_x[1]+self_offset[1]]
+
+        # find the pixel coordinates of the overlaps on another original data
+        another_offset = (max(0,-pixel_another_y[0]), max(0,-pixel_another_x[0]))
+        # import data from another_data into the empty subtracted data, and subtract 2 data
+        data = data - another_satmap.data[another_offset[0]:pixel_data_y[1]+another_offset[0], another_offset[1]:pixel_data_x[1]+another_offset[1]]
+
+        # copy the data info from the addend, but update the new coords
+        meta = self.meta.copy()
+        meta['ycoords'] = data_coords_y
+        meta['xcoords'] = data_coords_x
+
+        # generate a new SatMap object and return
+        setmap  = type(self)(meta, data)
+        return setmap
 
     def mosaic(self,
                _parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':

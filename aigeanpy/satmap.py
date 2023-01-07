@@ -76,16 +76,19 @@ class Fand:
 
 
 class SatMap:
-    '''
-    Docstring
-    '''
-    def __init__(self, meta, data, shape, fov, centre):
+    def __init__(self, meta, data):
+        """initial
+
+        Args:
+            meta (dict): including info of data. keys including ('archive','instrument','observatory','resolution','xcoords','ycoords','obs_time')
+            data (ndarray): data
+        """
         self.meta = meta
         self.data = data
-        self.shape = shape
-        self.fov = fov
-        self.centre = centre
-
+        self.fov = (meta['xcoords'][1] - meta['xcoords'][0], meta['ycoords'][1] - meta['ycoords'][0])
+        self.shape = data.shape
+        self.centre = (int((meta['xcoords'][1] + meta['xcoords'][0])/2), int((meta['ycoords'][1] + meta['ycoords'][0])/2))
+        
     def __add__(self,
                 _parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
         # For collating the two SatMap objects’ data?

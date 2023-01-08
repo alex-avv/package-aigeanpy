@@ -1,5 +1,13 @@
+import io
+import json
+import zipfile
 import numpy as np
+import requests
+import h5py
+import asdf
+from pathlib import Path
 from skimage import transform
+
 
 def earth_to_pixel(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
     '''
@@ -28,54 +36,83 @@ def get_satmap(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
     raise NotImplementedError
 
 
-class Lir:
+class FileFormatter:
+    def __init__(self, url):
+        self.url = url
+
+    def download_file(self, path):
+        response = requests.get(self.url, allow_redirects=True)
+        path = Path(path)
+        path.write_bytes(response.content)
+
+    def format_file_values(self, key_value_pair):
+        return {
+                "instrument": key_value_pair["instrument"], 
+                "observatory": key_value_pair["observatory"],
+                "resolution": key_value_pair["resolution"], 
+                "xcoords": key_value_pair["xcoords"],
+                "ycoords": key_value_pair["ycoords"], 
+                "obs_time": key_value_pair["time"]
+            }
+
+    def extract_data(self):
+        raise NotImplementedError
+
+
+class Lir(FileFormatter):
     '''
     Docstring
     '''
-
     # Extract Lir data (stored in .asdf file format) using Strategy Pattern
-    def extract_data(self, _parameters:
-                     'Parameters_Data_Type') -> 'Returns_Data_Type':
+    def extract_data(self) -> SatMap:
         '''
         Docstring
         '''
 
-        ...
-        raise NotImplementedError
+        self.download_file("test.asdf")
+        with asdf.open("test.asdf") as f:
+            meta = self.format_file_values(f)
+            dataset = np.array(f["data"])
+            return SatMap(meta, dataset)
 
 
-class Manannan:
+class Manannan(FileFormatter):
     '''
     Docstring
     '''
 
     # Extract Manannan data (stored in .hdf5 file format) using Strategy
     # Pattern
-    def extract_data(self, _parameters:
-                     'Parameters_Data_Type') -> 'Returns_Data_Type':
+    def extract_data(self) -> SatMap:
         '''
         Docstring
         '''
 
-        ...
-        raise NotImplementedError
+        self.download_file("test.hdf5")
+        with h5py.File("test.hdf5", "r") as f:
+            attributes = f["observation"].attrs
+            dataset = np.array(f['observation'].get("data"))
+            meta = self.format_file_values(attributes)
+            
+            return SatMap(meta, dataset)
 
-
-class Fand:
+            
+class Fand(FileFormatter):
     '''
     Docstring
     '''
 
     # Extract Fand data [stored in .zipfile(.npy, .json) file format] using
     # Strategy Pattern
-    def extract_data(self, _parameters:
-                     'Parameters_Data_Type') -> 'Returns_Data_Type':
+    def extract_data(self) -> SatMap:
         '''
         Docstring
         '''
-
-        ...
-        raise NotImplementedError
+        self.download_file("test.zip")
+        with zipfile.ZipFile("test.zip", "r") as files:
+            meta = self.format_file_values(json.loads(files.read("metadata.json")))
+            dataset = np.load(io.BytesIO(files.read("observation.npy")))
+            return SatMap(meta, dataset)
 
 
 class SatMap:

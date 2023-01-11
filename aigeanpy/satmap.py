@@ -98,14 +98,22 @@ class SatMap:
     def __add__(self,another_satmap):
         """do the object adding
 
-        Args:
-            another_satmap (SatMap): another satmap object
+        Parameters
+        ----------
+        another_satmap : SatMap
+            another SatMap object
 
-        Raises:
-            ValueError: if the 2 satmap have different resolution, raise error
+        Returns
+        -------
+        SatMap
+            a new object that have been added
 
-        Returns:
-            SatMap: a new object that have been added
+        Raises
+        ------
+        error
+            _description_
+        ValueError
+            if the 2 satmap have different resolution, raise error
         """        
         if self.meta['resolution'] != another_satmap.meta['resolution']:
             raise ValueError('Different instrument cannot be added')
@@ -124,12 +132,9 @@ class SatMap:
         pixel_another_x, pixel_another_y = earth_to_pixel(another_satmap.meta['xcoords'], another_satmap.meta['ycoords'], offset, resolution)
 
         # generate empty added data
-        data_1 = np.zeros((pixel_data_y[1]-pixel_data_y[0], pixel_data_x[1]-pixel_data_x[0]))
-        data_2 = np.zeros((pixel_data_y[1]-pixel_data_y[0], pixel_data_x[1]-pixel_data_x[0]))
-        # import data from 2 data into the empty added data
-        data_1[pixel_self_y[0]:pixel_self_y[1], pixel_self_x[0]:pixel_self_x[1]] = self.data
-        data_2[pixel_another_y[0]:pixel_another_y[1], pixel_another_x[0]:pixel_another_x[1]] = another_satmap.data
-        data = data_1 + data_2
+        data = np.zeros((pixel_data_y[1]-pixel_data_y[0], pixel_data_x[1]-pixel_data_x[0]))
+        data[pixel_self_y[0]:pixel_self_y[1], pixel_self_x[0]:pixel_self_x[1]] = self.data
+        data[pixel_another_y[0]:pixel_another_y[1], pixel_another_x[0]:pixel_another_x[1]] = another_satmap.data
 
         # copy the data info from the addend, but update the new coords
         meta = self.meta.copy()

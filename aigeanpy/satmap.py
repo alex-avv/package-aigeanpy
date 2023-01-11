@@ -35,6 +35,36 @@ def get_satmap(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
     ...
     raise NotImplementedError
 
+def meta_generate(meta_origin):
+    """generate meta data
+
+    Parameters
+    ----------
+    meta_origin : dict
+        a dict with multiple informations
+
+    Returns
+    -------
+    dict
+        a dict including info of data. keys including ('archive','instrument','observatory','resolution','xcoords','ycoords','obs_time')
+    """    
+    meta = {}
+    # meta contain following keys
+    meta_list = ['archive','instrument','observatory','resolution','xcoords','ycoords']
+    for key in meta_list:
+        # update the information to the meta
+        try:
+            meta.update({key:meta_origin[key]})
+        # update with an empty value if the file do not contain the key
+        except:
+            meta.update({key:''})
+
+    # change coords into tuple, the type of each element is int
+    meta['xcoords'] = tuple(map(int,meta['xcoords']))
+    meta['ycoords'] = tuple(map(int,meta['ycoords']))
+    # combine the date and time
+    meta.update({'obs_date':meta_origin['date']+' '+meta_origin['time']})
+    return meta
 
 class FileFormatter:
     def __init__(self, url):

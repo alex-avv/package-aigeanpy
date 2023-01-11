@@ -35,6 +35,27 @@ def get_satmap(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
     ...
     raise NotImplementedError
 
+def get_hdf5(filename):
+    """get meta and data from file
+
+    Parameters
+    ----------
+    filename : str
+        the name of the file holding the data information
+
+    Returns
+    -------
+    dict
+        including info of data. keys including ('archive','instrument','observatory','resolution','xcoords','ycoords','obs_time')
+    array
+        data array
+    """    
+    with h5py.File('..'+filename, 'r') as f:
+        for key in f.keys():
+            data = np.array(f[key]['data'])
+            meta = meta_generate(f[key].attrs)
+    return meta, data
+
 def get_asdf(filename):
     """get meta and data from file
 

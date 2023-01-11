@@ -148,15 +148,17 @@ class SatMap:
     def __sub__(self, another_satmap):
         """do the object subtract
 
-        Args:
-            another_satmap (SatMap): another satmap object
+        Parameters
+        ----------
+        another_satmap : SatMap
+            another SatMap object
 
-        Raises:
-            ValueError: _description_
 
-        Returns:
-            SatMap: a new object that have been added
-        """     
+        Returns
+        -------
+        SatMap
+            a new object that have been subtracted
+        """        
         # earth coords of the new object
         data_coords_x = (max(self.meta['xcoords'][0], another_satmap.meta['xcoords'][0]),min(self.meta['xcoords'][1], another_satmap.meta['xcoords'][1]))
         data_coords_y = (max(self.meta['ycoords'][0], another_satmap.meta['ycoords'][0]),min(self.meta['ycoords'][1], another_satmap.meta['ycoords'][1]))

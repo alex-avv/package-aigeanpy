@@ -1,13 +1,35 @@
 import numpy as np
 from skimage import transform
 
-def earth_to_pixel(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
-    '''
-    Docstring
-    '''
+def earth_to_pixel(x, y, offset, resolution):
+    """change earth coordinate to pixel coordinate
 
-    ...
-    raise NotImplementedError
+    Parameters
+    ----------
+    x : tuple
+        earth coordinate, xcoords
+    y : tuple
+        earth coordinate, ycoords
+    offset : tuple
+        earth distance from coordinate xy top left to the origin(0,0)
+    resolution : int
+        data resolution
+
+    Returns
+    -------
+    tuple
+        pixel coordinate, xcoords
+    tuple
+        pixel coordinate, ycoords. Positive y-values going downwards
+    """    
+    # change to the pixel distance
+    offset = (offset[0] // resolution, offset[1] // resolution)
+
+    # change earth coords to the pixel coords by dividing resolution and move the coords to the origin
+    pixel_xcoords = (x[0] // resolution-offset[0], x[1] // resolution-offset[0])
+    # Filp the Y-axis to achieve: In the top-left corner and positive y-values going downwards. 
+    pixel_ycoords = (abs(y[1] // resolution-offset[1]), abs(y[0] // resolution-offset[1]))
+    return pixel_xcoords, pixel_ycoords
 
 
 def pixel_to_earth(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':

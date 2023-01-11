@@ -241,10 +241,51 @@ class SatMap:
             setmap = setmap_self + setmap_another
         # if without padding, generate the max non-empty data
         else:
+            # mosaic added with padding=True
             setmap_padding = setmap_self + setmap_another
-            intersect_coords_x = (max(self.meta['xcoords'][0], another_satmap.meta['xcoords'][0]),min(self.meta['xcoords'][1], another_satmap.meta['xcoords'][1]))
-            intersect_coords_y = (max(self.meta['ycoords'][0], another_satmap.meta['ycoords'][0]),min(self.meta['ycoords'][1], another_satmap.meta['ycoords'][1]))
-        
+            # get the intersection coords
+            intersect_coords_x = (max(setmap_self.meta['xcoords'][0], setmap_another.meta['xcoords'][0]),min(setmap_self.meta['xcoords'][1], setmap_another.meta['xcoords'][1]))
+            intersect_coords_y = (max(setmap_self.meta['ycoords'][0], setmap_another.meta['ycoords'][0]),min(setmap_self.meta['ycoords'][1], setmap_another.meta['ycoords'][1]))
+            # earth distance from new object top left to the origin(0,0)
+            offset = (setmap_padding.meta['xcoords'][0],setmap_padding.meta['ycoords'][1])
+            
+            # change earth coords to pixel coords
+            pixel_data_x, pixel_data_y = earth_to_pixel(intersect_coords_x, intersect_coords_y, offset, resolution)
+            pixel_pad_x, pixel_pad_y = earth_to_pixel(setmap_padding.meta['xcoords'], setmap_padding.meta['ycoords'], offset, resolution)
+            pixel_self_x, pixel_self_y = earth_to_pixel(setmap_self.meta['xcoords'], setmap_self.meta['ycoords'], offset, resolution)
+            pixel_another_x, pixel_another_y = earth_to_pixel(setmap_another.meta['xcoords'], setmap_another.meta['ycoords'], offset, resolution)
+
+            # 4 conditions. and shape=['xcoords', 'ycoords'] of each condition.
+            # shape_1 is: Intercept the overlap area horizontally in the mosaic added data
+            # shape_2 is: Intercept the overlap area vertically in the mosaic added data
+            # shape_3 is: The 'self.data' is the largest after up-sampling or down-sampling
+            # shape_4 is: The 'another_satmap.data' is the largest after up-sampling or down-sampling
+            shape_1 = [pixel_data_x, pixel_pad_y]
+            shape_2 = [pixel_pad_x, pixel_data_y]
+            shape_3 = [pixel_self_x, pixel_self_y]
+            shape_4 = [pixel_another_x, pixel_another_y]
+            # list of 4 condition coords
+            shape = [shape_1, shape_2, shape_3, shape_4]
+            
+            # get the index of maximum area by multiplying the length and width of the data
+            index = np.argmax(np.array([(shape[i][0][1]-shape[i][0][0])*(shape[i][1][1]-shape[i][1][0]) for i in range(len(shape))]))
+            # get the coords of max area
+            max_coords_x = shape[index][0]
+            max_coords_y = shape[index][1]
+
+            # import data from mosaic added data into the non-empty mosaic added data
+            data = setmap_padding.data[max_coords_y[0]:max_coords_y[1], max_coords_x[0]:max_coords_x[1]]
+
+            # change the pixel coords to the pixel coords
+            earth_xcoords, earth_ycoords = earth_to_pixel(max_coords_x, max_coords_y, offset, resolution)
+
+            # copy the data info from the addend, but update the new coords
+            meta = setmap_self.meta.copy()
+            meta['ycoords'] = earth_ycoords
+            meta['xcoords'] = earth_xcoords
+
+            # generate a new SatMap object and return
+            setmap  = type(self)(meta, data)
         return setmap
 
     def visualise(self,

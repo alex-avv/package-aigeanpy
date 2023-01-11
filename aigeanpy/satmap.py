@@ -196,19 +196,25 @@ class SatMap:
     def mosaic(self,another_satmap,resolution=None,padding=True):
         """do the more complex object adding
 
-        Args:
-            another_satmap (SatMap): another satmap object
-            resolution (int, optional): the resolution of the desired data. Defaults to None.
-            padding (bool, optional): a flag determines whether emtpy space is reserved. Defaults to True.
+        Parameters
+        ----------
+        another_satmap : SatMap
+            another SatMap object
+        resolution : int, optional
+            the resolution of the desired data, by default None
+        padding : bool, optional
+            a flag determines whether emtpy space is reserved, by default True
 
-        Returns:
-            SatMap: a new object that have been added
-        """      
+        Returns
+        -------
+        SatMap
+            a new object that have been added
+        """        
         # if the resolution is not specified, choose the smaller resolution
         if resolution == None:
             resolution = min(self.meta['resolution'], another_satmap.meta['resolution'])
 
-        # rescale the data, and use different function for up-sampling and down-sampling
+        # rescale the data, but use different function for up-sampling and down-sampling
         if resolution <self.meta['resolution']:
             data_self = transform.rescale(self.data, self.meta['resolution']/resolution)
         else:
@@ -233,7 +239,6 @@ class SatMap:
         # if padding, call the __add__ function
         if padding:
             setmap = setmap_self + setmap_another
-
         # if without padding, generate the max non-empty data
         else:
             setmap_padding = setmap_self + setmap_another

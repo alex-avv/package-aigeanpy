@@ -27,13 +27,35 @@ def pixel_to_earth(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
     raise NotImplementedError
 
 
-def get_satmap(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
-    '''
-    Docstring
-    '''
+def get_satmap(filename):
+    """create a SatMap object through data file
 
-    ...
-    raise NotImplementedError
+    Parameters
+    ----------
+    filename : str
+        the name of the file holding the data information
+
+    Returns
+    -------
+    SatMap
+        generate a a SatMap object
+    """    
+    meta = {}
+    data = []
+    # if it is a HDF5 file, call the get_hdf5 function
+    if 'hdf5' in filename:
+        meta, data = get_hdf5(filename)
+
+    # if it is a ASDF file, call the get_asdf function
+    if 'asdf' in filename:
+        meta, data = get_asdf(filename)
+
+    # if it is a zip file, call the get_zip function
+    if 'zip' in filename:
+        meta, data = get_zip(filename)
+    # create a SatMap object
+    satmap = SatMap(meta,data)
+    return satmap
 
 def get_hdf5(filename):
     """get meta and data from file

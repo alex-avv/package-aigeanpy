@@ -1,10 +1,65 @@
-def query_isa(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
-    '''
-    Docstring
-    '''
+import requests
+import json
+from pathlib import Path
+import datetime
 
-    ...
-    raise NotImplementedError
+Now = datetime.datetime.now()
+Current_time = Now.strftime("%Y-%m-%d")
+
+def query_isa(start_date=Current_time, stop_date=Current_time, instrument=''):
+    """query isa with start date, stop date and instrument
+
+    Parameters
+    ----------
+    start_date : str, optional
+        the start date of the data query, by default Current_time
+    stop_date : str, optional
+        the stop date of the data query, by default Current_time
+    instrument : str, optional
+        instrument for query data, by default ''
+
+    Returns
+    -------
+    Response
+        Response message from the url
+
+    Raises
+    ------
+    ValueError
+        Start time should be in YYYY-MM-DD format
+    ValueError
+        Stop time should be in YYYY-MM-DD format
+    ValueError
+        Range requested too long - this service is limited to 3 days
+    ConnectionError
+        There is no internet connection
+    """    
+    try:
+        time_start = datetime.datetime.strptime(start_date, '%Y-%m-%d')
+    except:
+        raise ValueError('Start time should be in YYYY-MM-DD format')
+    try:
+        time_stop = datetime.datetime.strptime(stop_date, '%Y-%m-%d')
+    except:
+        raise ValueError('Stop time should be in YYYY-MM-DD format')
+    if (time_stop-time_start).days > 3:
+        raise ValueError('Range requested too long - this service is limited to 3 days')
+    if (time_stop-time_start).days < 0:
+        raise ValueError('Stop time should be after the start time')
+
+    if stop_date == Current_time:
+        stop_date = ''
+    else:
+        stop_date = '&stop_date='+stop_date
+
+    if instrument != '':
+        instrument = '&instrument='+instrument
+    http = 'http://dokku-app.dokku.arc.ucl.ac.uk/isa-archive/query/?start_date='+start_date+stop_date+instrument
+    try:
+        response = requests.get(http)
+    except:
+        raise ConnectionError('There is no internet connection')
+    return response
 
 
 def download_isa(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':

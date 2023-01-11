@@ -62,10 +62,17 @@ def query_isa(start_date=Current_time, stop_date=Current_time, instrument=''):
     return response
 
 
-def download_isa(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
-    '''
-    Docstring
-    '''
+def download_isa(filename, save_dir=''):
+    """download the file 
 
-    ...
-    raise NotImplementedError
+    Parameters
+    ----------
+    filename : str
+        filename you want to download from internet, you can see through the output of query_isa
+    save_dir : str, optional
+        the file saving path, by default ''
+    """    
+    http = 'http://dokku-app.dokku.arc.ucl.ac.uk/isa-archive/download/?filename='+filename
+    response = requests.get(http)
+    path = Path(save_dir+filename)
+    path.write_bytes(response.content)

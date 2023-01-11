@@ -80,18 +80,21 @@ class Fand:
 
 class SatMap:
     def __init__(self, meta, data):
-        """initial
+        """initial the SatMap class
 
-        Args:
-            meta (dict): including info of data. keys including ('archive','instrument','observatory','resolution','xcoords','ycoords','obs_time')
-            data (ndarray): data
-        """
+        Parameters
+        ----------
+        meta : dict
+            including info of data. keys including ('archive','instrument','observatory','resolution','xcoords','ycoords','obs_time')
+        data : array
+            data
+        """        
         self.meta = meta
         self.data = data
         self.fov = (meta['xcoords'][1] - meta['xcoords'][0], meta['ycoords'][1] - meta['ycoords'][0])
         self.shape = data.shape
         self.centre = (int((meta['xcoords'][1] + meta['xcoords'][0])/2), int((meta['ycoords'][1] + meta['ycoords'][0])/2))
-        
+             
     def __add__(self,another_satmap):
         """do the object adding
 

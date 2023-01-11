@@ -35,6 +35,26 @@ def get_satmap(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
     ...
     raise NotImplementedError
 
+def get_asdf(filename):
+    """get meta and data from file
+
+    Parameters
+    ----------
+    filename : str
+        the name of the file holding the data information
+
+    Returns
+    -------
+    dict
+        including info of data. keys including ('archive','instrument','observatory','resolution','xcoords','ycoords','obs_time')
+    array
+        data array
+    """     
+    with asdf.open('..'+filename, 'r') as f:
+        meta = meta_generate(f)
+        data = np.array(f['data'])
+    return meta, data
+
 def get_zip(filename):
     """get meta and data from file
 

@@ -32,13 +32,31 @@ def earth_to_pixel(x, y, offset, resolution):
     return pixel_xcoords, pixel_ycoords
 
 
-def pixel_to_earth(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
-    '''
-    Docstring
-    '''
+def pixel_to_earth(x, y, offset, resolution):
+    """change pixel coordinate to earth coordinate
 
-    ...
-    raise NotImplementedError
+    Parameters
+    ----------
+    x : tuple
+        pixel coordinate, xcoords
+    y : tuple
+        pixel coordinate, ycoords
+    offset : tuple
+        earth distance from coordinate xy top left to the origin(0,0)
+    resolution : int
+        data resolution
+
+    Returns
+    -------
+    tuple
+        earth coordinate, xcoords
+    tuple
+        earth coordinate, ycoords.
+    """    
+    # change pixel coords to the earth coords by multiply resolution and add offset
+    xcoords = (offset[0] + x[0]*resolution, offset[0] + x[1]*resolution)
+    ycoords = (offset[1] + y[0]*resolution, offset[1] + y[1]*resolution)
+    return xcoords, ycoords
 
 
 def get_satmap(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':

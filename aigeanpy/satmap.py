@@ -1,11 +1,11 @@
-import io
 import json
-import zipfile
-import numpy as np
-import requests
 import h5py
 import asdf
-from pathlib import Path
+import zipfile
+import numpy as np
+from io import BytesIO
+from matplotlib import pyplot as plt
+import skimage
 from skimage import transform
 
 
@@ -34,6 +34,27 @@ def get_satmap(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
 
     ...
     raise NotImplementedError
+
+def get_zip(filename):
+    """get meta and data from file
+
+    Parameters
+    ----------
+    filename : str
+        the name of the file holding the data information
+
+    Returns
+    -------
+    dict
+        including info of data. keys including ('archive','instrument','observatory','resolution','xcoords','ycoords','obs_time')
+    array
+        data array
+    """    
+    with zipfile.ZipFile('..'+filename, 'r') as f:
+        file_json = json.load(BytesIO(f.read(f.namelist()[0])))
+        meta = meta_generate(file_json)
+        data = np.load(BytesIO(f.read(f.namelist()[1])))
+    return meta, data
 
 def meta_generate(meta_origin):
     """generate meta data

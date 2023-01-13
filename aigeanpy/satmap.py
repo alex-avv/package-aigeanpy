@@ -23,31 +23,26 @@ def earth_to_pixel(x, y, resolution):
     return x//resolution, y//resolution 
 
 
-def pixel_to_earth(x, y, offset, resolution):
+def pixel_to_earth(x, y, resolution):
     """change pixel coordinate to earth coordinate
 
     Parameters
     ----------
-    x : tuple
+    x : int
         pixel coordinate, xcoords
-    y : tuple
+    y : int
         pixel coordinate, ycoords
-    offset : tuple
-        earth distance from coordinate xy top left to the origin(0,0)
     resolution : int
         data resolution
 
     Returns
     -------
-    tuple
+    int
         earth coordinate, xcoords
-    tuple
-        earth coordinate, ycoords.
+    int
+        earth coordinate, ycoords
     """    
-    # change pixel coords to the earth coords by multiply resolution and add offset
-    xcoords = (offset[0] + x[0]*resolution, offset[0] + x[1]*resolution)
-    ycoords = (offset[1] + y[0]*resolution, offset[1] + y[1]*resolution)
-    return xcoords, ycoords
+    return x*resolution, y*resolution
 
 
 def get_satmap(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':

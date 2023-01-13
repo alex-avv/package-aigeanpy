@@ -1,5 +1,6 @@
 import numpy as np
 from skimage import transform
+import os
 
 def earth_to_pixel_tuple(x, y, resolution):
     """change earth coordinate to pixel coordinate
@@ -110,7 +111,7 @@ class SatMap:
         Parameters
         ----------
         meta : dict
-            including info of data. keys including ('archive','instrument','observatory','resolution','xcoords','ycoords','obs_time', 'extra')
+            including info of data. keys including ('archive','instrument','observatory','resolution','xcoords','ycoords','obs_date')
         data : array
             data
         
@@ -194,6 +195,7 @@ class SatMap:
 
         # generate a new SatMap object and return
         setmap  = type(self)(meta, data)
+        setmap.extra = True
         return setmap
 
     def __sub__(self, another_satmap):
@@ -269,6 +271,7 @@ class SatMap:
 
         # generate a new SatMap object and return
         setmap  = type(self)(meta, data)
+        setmap.extra = True
         return setmap
 
     def mosaic(self,another_satmap,resolution=None,padding=True):
@@ -406,6 +409,7 @@ class SatMap:
 
             # generate a new SatMap object and return
             setmap  = type(self)(meta, data)
+        setmap.extra = True
         return setmap
 
     def visualise(self, save=False, save_path=''):

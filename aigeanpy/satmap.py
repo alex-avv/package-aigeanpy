@@ -110,16 +110,28 @@ class SatMap:
         Parameters
         ----------
         meta : dict
-            including info of data. keys including ('archive','instrument','observatory','resolution','xcoords','ycoords','obs_time')
+            including info of data. keys including ('archive','instrument','observatory','resolution','xcoords','ycoords','obs_time', 'extra')
         data : array
             data
-        """        
+        
+        Raises
+        ------
+        TypeError
+            Meta must in dict type
+        TypeError
+            Data must in np.ndarray type
+        """      
+        if type(meta) is not dict:
+            raise TypeError('Meta must in dict type')
+        if type(data) is not np.ndarray:
+            raise TypeError('Data must in np.ndarray type')
         self.meta = meta
         self.data = data
         self.fov = (meta['xcoords'][1] - meta['xcoords'][0], meta['ycoords'][1] - meta['ycoords'][0])
         self.shape = data.shape
         self.centre = (int((meta['xcoords'][1] + meta['xcoords'][0])/2), int((meta['ycoords'][1] + meta['ycoords'][0])/2))
-             
+        self.extra = False
+                  
     def __add__(self,another_satmap):
         """do the object adding
 

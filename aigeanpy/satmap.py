@@ -22,6 +22,30 @@ def earth_to_pixel(x, y, resolution):
     """    
     return x//resolution, y//resolution 
 
+def pixel_to_earth_tuple(x, y, resolution):
+    """change pixel coordinate to earth coordinate
+
+    Parameters
+    ----------
+    x : tuple
+        pixel coordinate, xcoords
+    y : tuple
+        pixel coordinate, ycoords
+    resolution : int
+        data resolution
+
+    Returns
+    -------
+    tuple
+        earth coordinate, xcoords
+    tuple
+        earth coordinate, ycoords
+    """    
+    # change earth coords to the pixel coords by dividing resolution and move the coords to the origin
+    xcoords = (pixel_to_earth(x[0], y[0], resolution)[0], pixel_to_earth(x[1], y[1], resolution)[0])
+    # Filp the Y-axis to achieve: In the top-left corner and positive y-values going downwards. 
+    ycoords = (pixel_to_earth(x[0], y[0], resolution)[1], pixel_to_earth(x[1], y[1], resolution)[1])
+    return xcoords, ycoords
 
 def pixel_to_earth(x, y, resolution):
     """change pixel coordinate to earth coordinate

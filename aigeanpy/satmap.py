@@ -39,6 +39,11 @@ def get_satmap(filename):
     -------
     SatMap
         generate a a SatMap object
+    
+    Raises
+    ------
+    ValueError
+        File must be hdf5, asdf or zip type
     """    
     meta = {}
     data = []
@@ -47,12 +52,14 @@ def get_satmap(filename):
         meta, data = get_hdf5(filename)
 
     # if it is a ASDF file, call the get_asdf function
-    if 'asdf' in filename:
+    elif 'asdf' in filename:
         meta, data = get_asdf(filename)
 
     # if it is a zip file, call the get_zip function
-    if 'zip' in filename:
+    elif 'zip' in filename:
         meta, data = get_zip(filename)
+    else:
+        raise ValueError('File must be hdf5, asdf or zip type')
     # create a SatMap object
     satmap = SatMap(meta,data)
     return satmap

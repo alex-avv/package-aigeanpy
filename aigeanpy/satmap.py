@@ -408,14 +408,40 @@ class SatMap:
             setmap  = type(self)(meta, data)
         return setmap
 
-    def visualise(self,
-                  _parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
-        '''
-        Docstring
-        '''
+    def visualise(self, save=False, save_path=''):
+        """visualise the data
 
-        ...
-        raise NotImplementedError
+        Parameters
+        ----------
+        save : bool, optional
+            choose plot the figure or show the figure, by default False
+        save_path : str, optional
+            the path figure saved, by default ''
+
+        Raises
+        ------
+        TypeError
+            Save must in bool type
+        TypeError
+            Save_path must be a str
+        """        
+        if type(save) is not bool:
+            raise TypeError('Save must in bool type')
+        if type(save_path) is not str:
+            raise TypeError('Save_path must be a str')
+        plt.imshow(self.data, origin='lower', extent=[self.meta['xcoords'][0], self.meta['xcoords'][1], self.meta['ycoords'][0], self.meta['ycoords'][1]])
+        if self.extra:
+            extra = '_extra'
+        else:
+            extra = ''
+        date_time = self.meta['obs_date'].split(' ')
+        date = ''.join(date_time[0].split('-'))
+        time = ''.join(date_time[1].split(':'))
+        filename = str(self.meta['observatory'])+'_'+str(self.meta['instrument'])+'_'+date+'_'+time+extra+'.png'
+        if save:
+            plt.savefig(os.path.join(save_path, filename))
+        else:
+            plt.show()
 
     def __str__(self) -> 'Returns_Data_Type':
         # For printing object information

@@ -131,7 +131,7 @@ class SatMap:
         self.shape = data.shape
         self.centre = (int((meta['xcoords'][1] + meta['xcoords'][0])/2), int((meta['ycoords'][1] + meta['ycoords'][0])/2))
         self.extra = False
-                  
+
     def __add__(self,another_satmap):
         """do the object adding
 
@@ -147,36 +147,50 @@ class SatMap:
 
         Raises
         ------
-        error
-            _description_
+        TypeError
+            Another_satmap must in SatMap type
         ValueError
-            if the 2 satmap have different resolution, raise error
-        """        
+            Different instrument cannot be added
+        ValueError
+            2 data must in the same day
+        """    
+        if type(another_satmap) is not SatMap:
+            raise TypeError('Another_satmap must in SatMap type')
         if self.meta['resolution'] != another_satmap.meta['resolution']:
             raise ValueError('Different instrument cannot be added')
+        if self.meta['obs_time'][:10] != another_satmap.meta['obs_time'][:10]:
+            raise ValueError('2 data must in the same day')
 
         # earth coords of the new object
-        data_coords_x = (min(self.meta['xcoords'][0], another_satmap.meta['xcoords'][0]),max(self.meta['xcoords'][1], another_satmap.meta['xcoords'][1]))
-        data_coords_y = (min(self.meta['ycoords'][0], another_satmap.meta['ycoords'][0]),max(self.meta['ycoords'][1], another_satmap.meta['ycoords'][1]))
+        data_ex = (min(self.meta['xcoords'][0], another_satmap.meta['xcoords'][0]),max(self.meta['xcoords'][1], another_satmap.meta['xcoords'][1]))
+        data_ey = (min(self.meta['ycoords'][0], another_satmap.meta['ycoords'][0]),max(self.meta['ycoords'][1], another_satmap.meta['ycoords'][1]))
         # earth distance from new object top left to the origin(0,0)
-        offset = (data_coords_x[0],data_coords_y[1])
+        offset = (data_ex[0],data_ey[1])
         # get resolution from object
         resolution =  self.meta['resolution']
-        
+
+        # earth coords without offset
+        data_ex_offset = (data_ex[0]-offset[0], data_ex[1]-offset[0])
+        data_ey_offset = (data_ey[0]-offset[1], data_ey[1]-offset[1])
+        self_ex_offset = (self.meta['xcoords'][0]-offset[0], self.meta['xcoords'][1]-offset[0])
+        self_ey_offset = (self.meta['ycoords'][0]-offset[0], self.meta['ycoords'][1]-offset[0])
+        another_ex_offset = (another_satmap.meta['xcoords'][0]-offset[0], another_satmap.meta['xcoords'][1]-offset[0])
+        another_ey_offset = (another_satmap.meta['ycoords'][0]-offset[0], another_satmap.meta['ycoords'][1]-offset[0])
+
         # change earth coords to pixel coords
-        pixel_data_x, pixel_data_y = earth_to_pixel(data_coords_x, data_coords_y, offset, resolution)
-        pixel_self_x, pixel_self_y = earth_to_pixel(self.meta['xcoords'], self.meta['ycoords'], offset, resolution)
-        pixel_another_x, pixel_another_y = earth_to_pixel(another_satmap.meta['xcoords'], another_satmap.meta['ycoords'], offset, resolution)
+        data_px, data_py = earth_to_pixel_tuple(data_ex_offset, data_ey_offset, resolution)
+        self_px, self_py = earth_to_pixel_tuple(self_ex_offset, self_ey_offset, resolution)
+        another_px, another_py = earth_to_pixel_tuple(another_ex_offset, another_ey_offset, resolution)
 
         # generate empty added data
-        data = np.zeros((pixel_data_y[1]-pixel_data_y[0], pixel_data_x[1]-pixel_data_x[0]))
-        data[pixel_self_y[0]:pixel_self_y[1], pixel_self_x[0]:pixel_self_x[1]] = self.data
-        data[pixel_another_y[0]:pixel_another_y[1], pixel_another_x[0]:pixel_another_x[1]] = another_satmap.data
+        data = np.zeros((data_py[1]-data_py[0], data_px[1]-data_px[0]))
+        data[self_py[0]:self_py[1], self_px[0]:self_px[1]] = self.data
+        data[another_py[0]:another_py[1], another_px[0]:another_px[1]] = another_satmap.data
 
         # copy the data info from the addend, but update the new coords
         meta = self.meta.copy()
-        meta['ycoords'] = data_coords_y
-        meta['xcoords'] = data_coords_x
+        meta['ycoords'] = data_ey
+        meta['xcoords'] = data_ex
 
         # generate a new SatMap object and return
         setmap  = type(self)(meta, data)

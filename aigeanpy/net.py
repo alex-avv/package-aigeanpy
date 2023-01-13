@@ -1,5 +1,4 @@
 import requests
-import json
 from pathlib import Path
 import datetime
 
@@ -25,15 +24,30 @@ def query_isa(start_date=Current_time, stop_date=Current_time, instrument=''):
 
     Raises
     ------
+    TypeError
+        Start data must in str type
+    TypeError
+        Stop data must in str type
+    TypeError
+        Instrument must in str type
     ValueError
         Start time should be in YYYY-MM-DD format
     ValueError
         Stop time should be in YYYY-MM-DD format
     ValueError
         Range requested too long - this service is limited to 3 days
+    ValueError
+        Stop time should be after the start time
     ConnectionError
         There is no internet connection
     """    
+    if type(start_date) is not str:
+        raise TypeError('Start data must in str type')
+    if type(stop_date) is not str:
+        raise TypeError('Stop data must in str type')
+    if type(instrument) is not str:
+        raise TypeError('Instrument must in str type')
+    # connection error
     try:
         time_start = datetime.datetime.strptime(start_date, '%Y-%m-%d')
     except:

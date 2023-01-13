@@ -85,8 +85,27 @@ def download_isa(filename, save_dir=''):
         filename you want to download from internet, you can see through the output of query_isa
     save_dir : str, optional
         the file saving path, by default ''
+    Raises
+    ------
+    TypeError
+        Filename must in str type
+    TypeError
+        Save_dir must in str type
+    ConnectionError
+        There is no internet connection
+    ValueError
+        File name is not valid, retype the valid file name
     """    
+    if type(filename) is not str:
+        raise TypeError('Filename must in str type')
+    if type(save_dir) is not str:
+        raise TypeError('Save_dir must in str type')
     http = 'http://dokku-app.dokku.arc.ucl.ac.uk/isa-archive/download/?filename='+filename
-    response = requests.get(http)
+    try:
+        response = requests.get(http)
+    except:
+        raise ConnectionError('There is no internet connection')
+    if response.status_code != 200:
+        raise ValueError('File name is not valid, retype the valid file name')
     path = Path(save_dir+filename)
     path.write_bytes(response.content)

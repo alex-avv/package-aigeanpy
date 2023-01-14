@@ -7,6 +7,7 @@ from io import BytesIO
 from matplotlib import pyplot as plt
 import skimage
 from skimage import transform
+from pathlib import Path
 
 
 def earth_to_pixel(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
@@ -47,30 +48,32 @@ def get_satmap(filename):
     """    
     meta = {}
     data = []
+    file_path_abs = sorted(Path().rglob(filename))[0]
+
     # if it is a HDF5 file, call the get_hdf5 function
     if 'hdf5' in filename:
-        meta, data = get_hdf5(filename)
+        meta, data = get_hdf5(file_path_abs)
 
     # if it is a ASDF file, call the get_asdf function
     elif 'asdf' in filename:
-        meta, data = get_asdf(filename)
+        meta, data = get_asdf(file_path_abs)
 
     # if it is a zip file, call the get_zip function
     elif 'zip' in filename:
-        meta, data = get_zip(filename)
+        meta, data = get_zip(file_path_abs)
     else:
         raise ValueError('File must be hdf5, asdf or zip type')
     # create a SatMap object
     satmap = SatMap(meta,data)
     return satmap
 
-def get_hdf5(filename):
+def get_hdf5(file_path):
     """get meta and data from file
 
     Parameters
     ----------
-    filename : str
-        the name of the file holding the data information
+    file_path : str
+        the file path of the file holding the data information
 
     Returns
     -------
@@ -79,19 +82,19 @@ def get_hdf5(filename):
     array
         data array
     """    
-    with h5py.File('..'+filename, 'r') as f:
+    with h5py.File(file_path, 'r') as f:
         for key in f.keys():
             data = np.array(f[key]['data'])
             meta = meta_generate(f[key].attrs)
     return meta, data
 
-def get_asdf(filename):
+def get_asdf(file_path):
     """get meta and data from file
 
     Parameters
     ----------
-    filename : str
-        the name of the file holding the data information
+    file_path : str
+        the file path of the file holding the data information
 
     Returns
     -------
@@ -100,18 +103,18 @@ def get_asdf(filename):
     array
         data array
     """     
-    with asdf.open('..'+filename, 'r') as f:
+    with asdf.open(file_path, 'r') as f:
         meta = meta_generate(f)
         data = np.array(f['data'])
     return meta, data
 
-def get_zip(filename):
+def get_zip(file_path):
     """get meta and data from file
 
     Parameters
     ----------
-    filename : str
-        the name of the file holding the data information
+    file_path : str
+        the file path of the file holding the data information
 
     Returns
     -------
@@ -120,7 +123,7 @@ def get_zip(filename):
     array
         data array
     """    
-    with zipfile.ZipFile('..'+filename, 'r') as f:
+    with zipfile.ZipFile(file_path, 'r') as f:
         file_json = json.load(BytesIO(f.read(f.namelist()[0])))
         meta = meta_generate(file_json)
         data = np.load(BytesIO(f.read(f.namelist()[1])))

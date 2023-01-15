@@ -26,10 +26,10 @@ def min_index(list):
   return list.index(min(list))
 
 
-def group_datas(group,Lprocess_data,alloc_data):
+def group_datas(group,Lprocess_data,alloc):
   group_data = []
   for j, p in enumerate(Lprocess_data):
-    if alloc_data[j]==group:
+    if alloc[j]==group:
       group_data.append(p)
   return group_data
 

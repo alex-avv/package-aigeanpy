@@ -1,20 +1,28 @@
-from math import *
-from random import *
+from math import sqrt
+from random import randrange
 import sys
 
 groups = 3
+interations =10
+file_path = sys.argv[1]
 
 #with safty open
-with open(sys.argv[1], 'r') as file:
-  lines = file.readlines()
+def file_reading(file_path):
+  with open(sys.argv[1], 'r') as file:
+    lines = file.readlines()
+  return lines
 
-process_data=[]
-for line in lines: 
-  process_data.append(tuple(map(float, line.strip().split(','))))# merge the data into list
+def data_loading(lines):
+  process_data=[]
+  for line in lines: 
+    process_data.append(tuple(map(float, line.strip().split(','))))# merge the data into list
+  return process_data
+
+
+lines = file_reading(file_path)
+process_data = data_loading(lines)
 
 central_point=[process_data[randrange(len(process_data))] for g in range(groups)] # random find the piont in dataset
-
-#[(),()]
 
 def distance2points(point1,Lpoint2):
   Ldistance2point = []
@@ -33,10 +41,11 @@ def group_datas(group,Lprocess_data,alloc):
       group_data.append(p)
   return group_data
 
+#[(),()]
 
 alloc=[]
 n=0
-while n<10:
+while n<interations:
   for point in process_data:
     #find each distance to the random point of each point
     Ldistance = distance2points(point,central_point)
@@ -52,3 +61,4 @@ for g in range(groups):
   print("Cluster " + str(g) + " is centred at " + str(central_point[g]) + " and has " + str(len(alloc_process_data)) + " points.")
 
   print(alloc_process_data)
+

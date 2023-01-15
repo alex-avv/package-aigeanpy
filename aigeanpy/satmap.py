@@ -55,6 +55,15 @@ def earth_to_pixel(x, y, resolution):
         pixel coordinate, xcoords
     int
         pixel coordinate, ycoords
+
+    Examples
+    --------
+    >>> from aigeanpy.satmap import earth_to_pixel
+    >>> x = 10
+    >>> y = 20
+    >>> resolution = 5
+    >>> earth_to_pixel(x,y,resolution)
+    (2, 4)
     """
     return x // resolution, y // resolution
 
@@ -103,6 +112,15 @@ def pixel_to_earth(x, y, resolution):
         earth coordinate, xcoords
     int
         earth coordinate, ycoords
+
+    Examples
+    --------
+    >>> from aigeanpy.satmap import pixel_to_earth
+    >>> x = 10
+    >>> y = 20
+    >>> resolution = 5
+    >>> pixel_to_earth(x,y,resolution)
+    (50, 100)
     """
     return x * resolution, y * resolution
 
@@ -124,6 +142,15 @@ class SatMapFactory():
             ------
             ValueError
                 File must match given file name
+
+            Examples
+            --------
+            >>> from aigeanpy.satmap import SatMapFactory
+            >>> satMapFactory = SatMapFactory()
+            >>> filename = 'aigean_fan_20230112_074702.zip'
+            >>> fand = satMapFactory.get_satmap_obj(filename)
+            >>> fand.meta
+            {'archive': 'ISA', 'instrument': 'Fand', 'observatory': 'Aigean', 'resolution': 5, 'xcoords': (600, 825), 'ycoords': (150, 200), 'obs_date': '2023-01-12 07:47:02'}
             """
         meta = {}
         data = []
@@ -164,6 +191,14 @@ def get_satmap(filename):
     -------
     SatMap
         generate a a SatMap object
+
+    Examples
+    --------
+    >>> from aigeanpy.satmap import get_satmap
+    >>> filename = 'aigean_fan_20230112_074702.zip'
+    >>> get_satmap(filename).meta
+    {'archive': 'ISA', 'instrument': 'Fand', 'observatory': 'Aigean', 'resolution': 5, 'xcoords': (600, 825), 'ycoords': (150, 200), 'obs_date': '2023-01-12 07:47:02'}
+
     """
     # create a SatMap object calling SatMap Factory
     satMapFactory = SatMapFactory()
@@ -273,13 +308,38 @@ def meta_generate(meta_origin):
 
 
 class SatMap:
+    """
+    SatMap class contains meta-data and figure data for three imagers, Lir, Manannan and Fand.
+
+
+    Attributes
+    ----------
+    meta : dict
+        including info of meta-data. keys including ('archive','instrument','observatory','resolution','xcoords','ycoords','obs_date')
+    data : array
+            data to generate the corresponding figure
+
+    Methods
+    -------
+    __init__(meta, data)
+        Initialize the SatMap class with corresponding meta-data and figure data.
+    __add__(another_satmap)
+        Add the other Satmap object to current Satmap object.
+    __sub__(another_satmap)
+        Subtract this Satmap with the other input Satmap.
+    mosaic(another_satmap, resolution=None, padding=True)
+        Do the more complex Satmap object adding.
+    visualise(self, save=False, save_path='')
+        Visualise this Satmap object with correponding figure data attribute
+
+    """
     def __init__(self, meta, data):
         """initial the SatMap class
 
         Parameters
         ----------
         meta : dict
-            including info of data. keys including ('archive','instrument','observatory','resolution','xcoords','ycoords','obs_date')
+            including info of meta-data. keys including ('archive','instrument','observatory','resolution','xcoords','ycoords','obs_date')
         data : array
             data
 
@@ -301,6 +361,7 @@ class SatMap:
         self.centre = (
         int((meta['xcoords'][1] + meta['xcoords'][0]) / 2), int((meta['ycoords'][1] + meta['ycoords'][0]) / 2))
         self.extra = False
+
 
     def __add__(self, another_satmap):
         """do the object adding
@@ -464,6 +525,7 @@ class SatMap:
 
         return new_satmap
 
+
     def mosaic(self, another_satmap, resolution=None, padding=True):
         """do the more complex object adding
 
@@ -614,6 +676,7 @@ class SatMap:
                 ((meta['xcoords'][1] + meta['xcoords'][0]) // 2), ((meta['ycoords'][1] + meta['ycoords'][0]) // 2))
         setmap.extra = True
         return setmap
+
 
     def visualise(self, save=False, save_path=''):
         """visualise the data

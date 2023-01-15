@@ -5,6 +5,7 @@ import datetime
 Now = datetime.datetime.now()
 Current_time = Now.strftime("%Y-%m-%d")
 
+
 def query_isa(start_date=Current_time, stop_date=Current_time, instrument=''):
     """query isa with start date, stop date and instrument
 

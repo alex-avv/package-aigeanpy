@@ -1,4 +1,10 @@
 import pytest
+import json
+import h5py
+import asdf
+import zipfile
+import numpy as np
+from io import BytesIO
 from aigeanpy import satmap
 from pathlib import Path
 
@@ -56,6 +62,169 @@ def test_pixel_to_earth_return_correct_value():
     y = 25
     resolution = 15
     assert satmap.pixel_to_earth(x,y,resolution) == (1125, 375)
+
+def test_SatMap_generate_correct_fov_attribute_value():
+    xcoords = (750, 1200)
+    ycoords = (250, 400)
+    expected_val_x = xcoords[1] - xcoords[0]
+    expected_val_y = ycoords[1] - ycoords[0]
+    expected = (expected_val_x, expected_val_y)
+
+    filename = 'aigean_man_20221205_194510.hdf5'
+    man = satmap.get_satmap(filename)
+    actual = man.fov
+    assert actual == expected
+
+def test_SatMap_generate_correct_centre_attribute_value():
+    xcoords = (750, 1200)
+    ycoords = (250, 400)
+    expected_val_x = int((xcoords[1] + xcoords[0])/2)
+    expected_val_y = int((ycoords[1] + ycoords[0])/2)
+    expected = (expected_val_x, expected_val_y)
+
+    filename = 'aigean_man_20221205_194510.hdf5'
+    man = satmap.get_satmap(filename)
+    actual = man.centre
+    assert actual == expected
+
+def test_SatMap_generate_correct_shape_attribute_value():
+    expected = (10,30)
+    filename = 'aigean_man_20221205_194510.hdf5'
+    man = satmap.get_satmap(filename)
+    actual = man.shape
+    assert actual == expected
+
+# Tests for SatMap function by using mock SatMap object fand and lir
+
+def _get_fand(filename):
+    file_path_abs = sorted(Path().rglob(filename))[0]
+    meta = {}
+    data = []
+    with zipfile.ZipFile(file_path_abs, 'r') as f:
+        file_json = json.load(BytesIO(f.read(f.namelist()[2])))
+        meta = _meta_generate(file_json)
+        data = np.load(BytesIO(f.read(f.namelist()[4])))
+    return satmap.Fand(meta, data)
+
+def _get_lir(filename):
+    file_path_abs = sorted(Path().rglob(filename))[0]
+    meta = {}
+    data = []
+    with asdf.open(file_path_abs, 'r') as f:
+        meta = _meta_generate(f)
+        data = np.array(f['data'])
+    return satmap.Lir(meta, data)
+
+def _meta_generate(meta_origin):
+    meta = {}
+    # meta contain following keys
+    meta_list = ['archive','instrument','observatory','resolution','xcoords','ycoords']
+    for key in meta_list:
+        # update the information to the meta
+        try:
+            meta.update({key:meta_origin[key]})
+        # update with an empty value if the file do not contain the key
+        except:
+            meta.update({key:''})
+
+    # change coords into tuple, the type of each element is int
+    meta['xcoords'] = tuple(map(int,meta['xcoords']))
+    meta['ycoords'] = tuple(map(int,meta['ycoords']))
+    # combine the date and time
+
+    date = f"{meta_origin['date']} {meta_origin['time']}"
+    meta.update({'obs_date': date})
+    return meta
+
+class Ecne:
+    pass
+
+def test_add_two_differetn_types_data_raise_TypeError():
+    fand_file = 'aigean_fan_20230104_150010.zip'
+    mock_fand = _get_fand(fand_file)
+
+    with pytest.raises(TypeError) as err:
+        ecne = Ecne()
+        mock_fand + ecne
+
+def test_add_two_SatMap_with_diff_resolution_rais_ValueError():
+    fand_file = 'aigean_fan_20230104_150010.zip'
+    mock_fand = _get_fand(fand_file)
+    lir_file = 'aigean_lir_20230104_145310.asdf'
+    mock_lir = _get_lir(lir_file)
+
+    with pytest.raises(ValueError) as err:
+        mock_fand + mock_lir
+
+def test_add_two_SatMap_from_diff_date():
+    fand_file = 'aigean_fan_20230104_150010.zip'
+    mock_fand = _get_fand(fand_file)
+    lir_file = 'aigean_lir_20230104_145310.asdf'
+    mock_lir = _get_lir(lir_file)
+
+    mock_lir.meta['obs_date'] = '2023-01-14 14:53:10'
+    with pytest.raises(ValueError) as err:
+        mock_fand + mock_lir
+
+def test_add_two_SatMap_should_generate_the_same_data_when_add_itself():
+    fand_file = 'aigean_fan_20230104_150010.zip'
+    fand1 = _get_fand(fand_file)
+    expected = fand1
+    actual = fand1 + fand1
+    assert (actual.data == expected.data).all()
+
+
+def test_add_two_SatMap_generate_correct_added_SatMap():
+    fand_file = 'aigean_fan_20230104_150010.zip'
+    fand1 = _get_fand(fand_file)
+    fand_file2 = 'aigean_fan_20230112_074702.zip'
+    fand2 = _get_fand(fand_file2)
+    # set the other satmap to be the same date, but contains a map with different shape
+    fand2.meta['obs_date'] = '2023-01-04 14:53:10'
+    actual = fand1 + fand2
+    # dict = {'archive': 'ISA', 'instrument': 'Fand', 'observatory': 'Aigean',
+    #         'resolution': 5, 'xcoords': (450, 675), 'ycoords': (150, 200), 'obs_date': '2023-01-04 15:00:10'}
+    # dict = {'archive': 'ISA', 'instrument': 'Lir', 'observatory': 'Aigean',
+    #         'resolution': 5, 'xcoords': (100, 700), 'ycoords': (0, 300), 'obs_date': '2023-01-04 14:53:10'}
+    expected_centre = (637, 175)
+    assert actual.centre == expected_centre
+
+def test_sub_two_SatMap_from_the_same_day_raise_ValueError():
+    fand_file = 'aigean_fan_20230104_150010.zip'
+    mock_fand = _get_fand(fand_file)
+    lir_file = 'aigean_lir_20230104_145310.asdf'
+    mock_lir = _get_lir(lir_file)
+
+    with pytest.raises(ValueError) as err:
+        mock_fand - mock_lir
+
+def test_sub_two_SatMap_with_diff_resolution_raise_ValueError():
+    fand_file = 'aigean_fan_20230104_150010.zip'
+    mock_fand = _get_fand(fand_file)
+    lir_file = 'aigean_lir_20230104_145310.asdf'
+    mock_lir = _get_lir(lir_file)
+
+    with pytest.raises(ValueError) as err:
+        mock_fand - mock_lir
+
+def test_sub_two_diff_instrument_raise_ValueError():
+    fand_file = 'aigean_fan_20230104_150010.zip'
+    mock_fand = _get_fand(fand_file)
+    ecne = Ecne()
+
+    with pytest.raises(TypeError) as err:
+        mock_fand - ecne
+
+def test_sub_two_overlap_satmap():
+    fand_file = 'aigean_fan_20230104_150010.zip'
+    fand1 = _get_fand(fand_file)
+    fand_file2 = 'aigean_fan_20230112_074702.zip'
+    fand2 = _get_fand(fand_file2)
+
+    actual = fand1 - fand2
+    actual_arr = actual.data
+    expected_arr = fand1.data[:,30:45] -fand2.data[:,:15]
+    assert (expected_arr == actual_arr).all()
 
 
 

@@ -1,7 +1,7 @@
 from math import sqrt
 from random import randrange
 
-def cluster(filename, clusters: int = 3, iterations: int = 3) -> list:
+def cluster(filename, clusters, iterations):
 
   lines = tool4kmeans.file_reading(filename)
 
@@ -26,7 +26,8 @@ def cluster(filename, clusters: int = 3, iterations: int = 3) -> list:
       central_point[g]=new_mean
     n=n+1
 
-  return alloc
+
+  return tool4kmeans.classify_points(process_data,alloc,clusters)
 
 
 class tool4kmeans:
@@ -61,6 +62,16 @@ class tool4kmeans:
         group_data.append(p)
     return group_data
 
+  def classify_points(points,alloc,clusters):
+    classified_clusters = []
+    for g in range(clusters):
+      alloc_process_data = tool4kmeans.group_datas(g,process_data,alloc)
+      classified_clusters.append(alloc_process_data)
+    
+    return classified_clusters
+
+    
+
 
 if __name__ == "__main__":
 
@@ -75,27 +86,25 @@ if __name__ == "__main__":
 
   args = parse.parse_args()
 
-  alloc = cluster(args.file_path,args.clusters,args.iters)
+  Lclustring_point = cluster(args.file_path,args.clusters,args.iters)
 
   if args.showclusters == True:
-
-    for g in range(args.clusters):
-      alloc_process_data = tool4kmeans.group_datas(g,process_data,alloc)
-      print("Cluster " + str(g) + " is centred at " + str(central_point[g]) + " and has " + str(len(alloc_process_data)) + " points.")
-
-      print(alloc_process_data)
+    g = 0
+    for p in Lclustring_point:
+      print("Cluster " + str(g) + " is centred at " + str(central_point[g]) + " and has " + str(len(p)) + " points.")
+      print(p)
+      g += 1
 
 
 
   if args.plotclusters == True:
-
     from matplotlib import pyplot as plt
 
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
 
-    for i in range(args.clusters):
-      alloc_ps = tool4kmeans.group_datas(i,process_data,alloc)
-      ax.scatter([a[0] for a in alloc_ps],[a[1] for a in alloc_ps],[a[2] for a in alloc_ps])
+    for p in Lclustring_point:
+      ax.scatter([a[0] for a in p],[a[1] for a in p],[a[2] for a in p])
     
     plt.show()
+

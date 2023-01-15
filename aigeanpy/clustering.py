@@ -22,7 +22,9 @@ def cluster(filename, clusters, iterations):
       alloc.append(tool4kmeans.min_index(Ldistance))# find the min distance index
     for g in range(clusters):
       alloc_process_data=tool4kmeans.group_datas(g,process_data,alloc)
-      new_mean=(sum([a[0] for a in alloc_process_data]) / len(alloc_process_data), sum([a[1] for a in alloc_process_data]) / len(alloc_process_data), sum([a[2] for a in alloc_process_data]) / len(alloc_process_data))
+      new_mean=(sum([a[0] for a in alloc_process_data]) / len(alloc_process_data), 
+      sum([a[1] for a in alloc_process_data]) / len(alloc_process_data), 
+      sum([a[2] for a in alloc_process_data]) / len(alloc_process_data))
       central_point[g]=new_mean
     n=n+1
 

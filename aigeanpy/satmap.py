@@ -491,33 +491,30 @@ class SatMap:
         TypeError
             Padding must be True or False
         ValueError
-            Different instrument cannot be added
-        ValueError
             Two data must overlap
         TypeError
             Resolution must be int type
         ValueError
             Resolution must larger than 0
         """
-        if type(another_satmap) is not SatMap:
+        if not isinstance(another_satmap, SatMap):
             raise TypeError('Another_satmap must in SatMap type')
-        if type(padding) is not bool:
+        if not isinstance(padding, bool):
             raise TypeError('Padding must be True or False')
-        if self.meta['resolution'] != another_satmap.meta['resolution']:
-            raise ValueError('Different instrument cannot be added')
         # check whether it is overlap
         data_ex = (max(self.meta['xcoords'][0], another_satmap.meta['xcoords'][0]),
                    min(self.meta['xcoords'][1], another_satmap.meta['xcoords'][1]))
         data_ey = (max(self.meta['ycoords'][0], another_satmap.meta['ycoords'][0]),
                    min(self.meta['ycoords'][1], another_satmap.meta['ycoords'][1]))
-        if not (data_ex[1] > data_ex[0] & data_ey[1] > data_ey[0]):
+
+        if not (data_ex[1] > data_ex[0] and data_ey[1] > data_ey[0]) and not padding:
             raise ValueError('Two data must overlap')
 
         # if the resolution is not specified, choose the smaller resolution
         if resolution == None:
             resolution = min(self.meta['resolution'], another_satmap.meta['resolution'])
         else:
-            if type(resolution) is not int:
+            if isinstance(resolution, int):
                 raise TypeError('Resolution must be int type')
             if resolution <= 0:
                 raise ValueError('Resolution must larger than 0')
@@ -525,10 +522,15 @@ class SatMap:
         # rescale the data, but use different function for up-sampling and down-sampling
         if resolution < self.meta['resolution']:
             data_self = transform.rescale(self.data, self.meta['resolution'] / resolution)
+        elif resolution == self.meta['resolution']:
+            data_self = self.data
         else:
             data_self = transform.downscale_local_mean(self.data, resolution // self.meta['resolution'])
+
         if resolution < another_satmap.meta['resolution']:
             data_another = transform.rescale(another_satmap.data, another_satmap.meta['resolution'] / resolution)
+        elif resolution == another_satmap['resolution']:
+            data_another = another_satmap.data
         else:
             data_another = transform.downscale_local_mean(another_satmap.data,
                                                           resolution // another_satmap.meta['resolution'])
@@ -545,6 +547,18 @@ class SatMap:
         # generate a new SatMap object
         setmap_another = type(another_satmap)(meta_another, data_another)
 
+        # setmap = setmap_self + setmap_another
+        # # update attributes for new SatMap
+        # min_x = min(setmap_self.meta['xcoords'][0], setmap_another.meta['xcoords'][0])
+        # max_x = max(setmap_self.meta['xcoords'][1], setmap_another.meta['xcoords'][1])
+        # data =
+        # setmap.fov = (meta['xcoords'][1] - meta['xcoords'][0], meta['ycoords'][1] - meta['ycoords'][0])
+        # setmap.shape = data.shape
+        # setmap.centre = (
+        #     ((meta['xcoords'][1] + meta['xcoords'][0]) // 2), ((meta['ycoords'][1] + meta['ycoords'][0]) // 2))
+        # setmap.extra = True
+
+
         # if padding, call the __add__ function
         if padding:
             setmap = setmap_self + setmap_another
@@ -552,6 +566,7 @@ class SatMap:
         else:
             # mosaic added with padding=True
             setmap_padding = setmap_self + setmap_another
+            print(setmap_padding.centre)
             # get the intersection coords
             intersect_coords_x = (max(setmap_self.meta['xcoords'][0], setmap_another.meta['xcoords'][0]),
                                   min(setmap_self.meta['xcoords'][1], setmap_another.meta['xcoords'][1]))
@@ -559,19 +574,20 @@ class SatMap:
                                   min(setmap_self.meta['ycoords'][1], setmap_another.meta['ycoords'][1]))
             # earth distance from new object top left to the origin(0,0)
             offset = (setmap_padding.meta['xcoords'][0], setmap_padding.meta['ycoords'][1])
+            print(intersect_coords_x, intersect_coords_y, offset)
 
             data_ex_offset = (intersect_coords_x[0] - offset[0], intersect_coords_x[1] - offset[0])
             data_ey_offset = (intersect_coords_y[0] - offset[1], intersect_coords_y[1] - offset[1])
             added_ex_offset = (
             setmap_padding.meta['xcoords'][0] - offset[0], setmap_padding.meta['xcoords'][1] - offset[0])
             added_ey_offset = (
-            setmap_padding.meta['ycoords'][0] - offset[0], setmap_padding.meta['ycoords'][1] - offset[0])
+            setmap_padding.meta['ycoords'][0] - offset[1], setmap_padding.meta['ycoords'][1] - offset[1])
             self_ex_offset = (self.meta['xcoords'][0] - offset[0], self.meta['xcoords'][1] - offset[0])
-            self_ey_offset = (self.meta['ycoords'][0] - offset[0], self.meta['ycoords'][1] - offset[0])
+            self_ey_offset = (self.meta['ycoords'][0] - offset[1], self.meta['ycoords'][1] - offset[1])
             another_ex_offset = (
             another_satmap.meta['xcoords'][0] - offset[0], another_satmap.meta['xcoords'][1] - offset[0])
             another_ey_offset = (
-            another_satmap.meta['ycoords'][0] - offset[0], another_satmap.meta['ycoords'][1] - offset[0])
+            another_satmap.meta['ycoords'][0] - offset[1], another_satmap.meta['ycoords'][1] - offset[1])
 
             # change earth coords to pixel coords
             data_px, data_py = _earth_to_pixel_tuple(data_ex_offset, data_ey_offset, resolution)
@@ -594,23 +610,39 @@ class SatMap:
             # get the index of maximum area by multiplying the length and width of the data
             index = np.argmax(np.array(
                 [(shape[i][0][1] - shape[i][0][0]) * (shape[i][1][1] - shape[i][1][0]) for i in range(len(shape))]))
+
+            print('index:',index)
+            for each_shape in shape:
+                print(each_shape)
             # get the coords of max area
             max_coords_x = shape[index][0]
             max_coords_y = shape[index][1]
+            print(max_coords_x, max_coords_y)
 
             # import data from mosaic added data into the non-empty mosaic added data
             data = setmap_padding.data[max_coords_y[0]:max_coords_y[1], max_coords_x[0]:max_coords_x[1]]
 
-            # change the pixel coords to the pixel coords
+            # change the pixel coords to the earth coords
             earth_xcoords, earth_ycoords = _pixel_to_earth_tuple(max_coords_x, max_coords_y, resolution)
+            print('here')
+            print(earth_xcoords, earth_ycoords)
 
             # copy the data info from the addend, but update the new coords
             meta = setmap_self.meta.copy()
-            meta['ycoords'] = (earth_ycoords[0] + offset[1], earth_ycoords[1] + offset[1])
             meta['xcoords'] = (earth_xcoords[0] + offset[0], earth_xcoords[1] + offset[0])
+            meta['ycoords'] = (offset[1] - earth_ycoords[1], offset[1] - earth_ycoords[0])
+            # meta['ycoords'] = (earth_ycoords[0] + offset[1], earth_ycoords[1] + offset[1])
 
+            print(offset)
+            print(meta['xcoords'], meta['ycoords'] )
             # generate a new SatMap object and return
             setmap = type(self)(meta, data)
+
+            # update attributes for new SatMap
+            setmap.fov = (meta['xcoords'][1] - meta['xcoords'][0], meta['ycoords'][1] - meta['ycoords'][0])
+            setmap.shape = data.shape
+            setmap.centre = (
+                ((meta['xcoords'][1] + meta['xcoords'][0]) // 2), ((meta['ycoords'][1] + meta['ycoords'][0]) // 2))
         setmap.extra = True
         return setmap
 

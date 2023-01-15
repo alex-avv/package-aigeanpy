@@ -207,7 +207,7 @@ def test_sub_two_SatMap_with_diff_resolution_raise_ValueError():
     with pytest.raises(ValueError) as err:
         mock_fand - mock_lir
 
-def test_sub_two_diff_instrument_raise_ValueError():
+def test_sub_two_diff_instrument_raise_TypeError():
     fand_file = 'aigean_fan_20230104_150010.zip'
     mock_fand = _get_fand(fand_file)
     ecne = Ecne()
@@ -226,5 +226,53 @@ def test_sub_two_overlap_satmap():
     expected_arr = fand1.data[:,30:45] -fand2.data[:,:15]
     assert (expected_arr == actual_arr).all()
 
+def test_mosaic_two_diff_instrument_raise_TypeError():
+    fand_file = 'aigean_fan_20230104_150010.zip'
+    mock_fand = _get_fand(fand_file)
+    ecne = Ecne()
 
+    with pytest.raises(TypeError) as err:
+        mock_fand.mosaic(ecne)
+
+def test_mosaic_only_allows_overlap_instruments_when_padding_is_false():
+    fand_file = 'aigean_fan_20230104_150010.zip'
+    mock_fand = _get_fand(fand_file)
+    lir_file = 'aigean_lir_20230104_145310.asdf'
+    mock_lir = _get_lir(lir_file)
+    mock_lir.meta['xcoords'] = (10,20)
+    mock_lir.meta['ycoords'] = (15,25)
+
+    with pytest.raises(ValueError) as err:
+        mock_fand.mosaic(mock_lir, padding=False)
+
+def test_mosaic_include_type_generate_correct_centre_with_padding_to_be_False():
+    fand_file = 'aigean_fan_20230104_150010.zip'
+    mock_fand = _get_fand(fand_file)
+    lir_file = 'aigean_lir_20230104_145310.asdf'
+    mock_lir = _get_lir(lir_file)
+
+    actual = mock_fand.mosaic(mock_lir, padding=False)
+    expected = (525, 150)
+    assert actual.centre == expected
+
+# def test_mosaic_intersect_type_generate_correct_centre_with_padding_to_be_False():
+#
+#     fand_file = 'aigean_fan_20230104_150010.zip'
+#     fand1 = _get_fand(fand_file)
+#     fand_file2 = 'aigean_fan_20230112_074702.zip'
+#     fand2 = _get_fand(fand_file2)
+#
+#     actual = fand1.mosaic(fand2, padding=False)
+#     expected = (637, 175)
+#     assert actual.centre == expected
+
+def test_mosaic_generate_correct_centre_with_padding_to_be_True():
+    fand_file = 'aigean_fan_20230104_150010.zip'
+    mock_fand = _get_fand(fand_file)
+    lir_file = 'aigean_lir_20230104_145310.asdf'
+    mock_lir = _get_lir(lir_file)
+
+    actual = mock_fand.mosaic(mock_lir)
+    expected = (400, 150)
+    assert actual.centre == expected
 

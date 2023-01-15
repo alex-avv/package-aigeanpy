@@ -300,8 +300,6 @@ class SatMap:
         TypeError
             Padding must be True or False
         ValueError
-            Different instrument cannot be added
-        ValueError
             Two data must overlap
         TypeError
             Resolution must be int type
@@ -312,12 +310,10 @@ class SatMap:
             raise TypeError('Another_satmap must in SatMap type')
         if type(padding) is not bool:
             raise TypeError('Padding must be True or False')
-        if self.meta['resolution'] != another_satmap.meta['resolution']:
-            raise ValueError('Different instrument cannot be added')
         # check whether it is overlap
         data_ex = (max(self.meta['xcoords'][0], another_satmap.meta['xcoords'][0]),min(self.meta['xcoords'][1], another_satmap.meta['xcoords'][1]))
         data_ey = (max(self.meta['ycoords'][0], another_satmap.meta['ycoords'][0]),min(self.meta['ycoords'][1], another_satmap.meta['ycoords'][1]))
-        if not (data_ex[1]>data_ex[0] & data_ey[1]>data_ey[0]):
+        if not (data_ex[1]>data_ex[0] and data_ey[1]>data_ey[0]):
             raise ValueError('Two data must overlap')
 
         # if the resolution is not specified, choose the smaller resolution
@@ -361,17 +357,17 @@ class SatMap:
             # get the intersection coords
             intersect_coords_x = (max(setmap_self.meta['xcoords'][0], setmap_another.meta['xcoords'][0]),min(setmap_self.meta['xcoords'][1], setmap_another.meta['xcoords'][1]))
             intersect_coords_y = (max(setmap_self.meta['ycoords'][0], setmap_another.meta['ycoords'][0]),min(setmap_self.meta['ycoords'][1], setmap_another.meta['ycoords'][1]))
-            # earth distance from new object top left to the origin(0,0)
-            offset = (setmap_padding.meta['xcoords'][0],setmap_padding.meta['ycoords'][1])
+            # earth distance from new object bottom left to the origin(0,0)
+            offset = (setmap_padding.meta['xcoords'][0],setmap_padding.meta['ycoords'][0])
 
             data_ex_offset = (intersect_coords_x[0]-offset[0], intersect_coords_x[1]-offset[0])
             data_ey_offset = (intersect_coords_y[0]-offset[1], intersect_coords_y[1]-offset[1])
             added_ex_offset = (setmap_padding.meta['xcoords'][0]-offset[0], setmap_padding.meta['xcoords'][1]-offset[0])
-            added_ey_offset = (setmap_padding.meta['ycoords'][0]-offset[0], setmap_padding.meta['ycoords'][1]-offset[0])
+            added_ey_offset = (setmap_padding.meta['ycoords'][0]-offset[1], setmap_padding.meta['ycoords'][1]-offset[1])
             self_ex_offset = (self.meta['xcoords'][0]-offset[0], self.meta['xcoords'][1]-offset[0])
-            self_ey_offset = (self.meta['ycoords'][0]-offset[0], self.meta['ycoords'][1]-offset[0])
+            self_ey_offset = (self.meta['ycoords'][0]-offset[1], self.meta['ycoords'][1]-offset[1])
             another_ex_offset = (another_satmap.meta['xcoords'][0]-offset[0], another_satmap.meta['xcoords'][1]-offset[0])
-            another_ey_offset = (another_satmap.meta['ycoords'][0]-offset[0], another_satmap.meta['ycoords'][1]-offset[0])
+            another_ey_offset = (another_satmap.meta['ycoords'][0]-offset[1], another_satmap.meta['ycoords'][1]-offset[1])
 
             # change earth coords to pixel coords
             data_px, data_py = earth_to_pixel_tuple(data_ex_offset, data_ey_offset, resolution)
@@ -412,7 +408,6 @@ class SatMap:
             setmap  = type(self)(meta, data)
         setmap.extra = True
         return setmap
-
     def visualise(self, save=False, save_path=''):
         """visualise the data
 

@@ -1,4 +1,4 @@
-def query_isa(Parameters: Parameters_Data_Type) -> Returns_Data_Type:
+def query_isa(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
     '''
     Docstring
     '''
@@ -7,7 +7,7 @@ def query_isa(Parameters: Parameters_Data_Type) -> Returns_Data_Type:
     raise NotImplementedError
 
 
-def download_isa(Parameters: Parameters_Data_Type) -> Returns_Data_Type:
+def download_isa(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
     '''
     Docstring
     '''

@@ -98,16 +98,17 @@ def download_isa(filename, save_dir=''):
         There is no internet connection
     ValueError
         File name is not valid, retype the valid file name
-    """    
-    if type(filename) is not str:
+    """
+    if not isinstance(filename, str):
         raise TypeError('Filename must in str type')
-    if type(save_dir) is not str:
+    if not isinstance(save_dir, str):
         raise TypeError('Save_dir must in str type')
     http = 'http://dokku-app.dokku.arc.ucl.ac.uk/isa-archive/download/?filename='+filename
     try:
         response = requests.get(http)
     except:
         raise ConnectionError('There is no internet connection')
+
     if response.status_code != 200:
         raise ValueError('File name is not valid, retype the valid file name')
 

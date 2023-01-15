@@ -56,6 +56,7 @@ def query_isa(start_date=Current_time, stop_date=Current_time, instrument=''):
         time_stop = datetime.datetime.strptime(stop_date, '%Y-%m-%d')
     except:
         raise ValueError('Stop time should be in YYYY-MM-DD format')
+
     if (time_stop-time_start).days > 3:
         raise ValueError('Range requested too long - this service is limited to 3 days')
     if (time_stop-time_start).days < 0:
@@ -69,9 +70,11 @@ def query_isa(start_date=Current_time, stop_date=Current_time, instrument=''):
     if instrument != '':
         instrument = '&instrument='+instrument
     http = 'http://dokku-app.dokku.arc.ucl.ac.uk/isa-archive/query/?start_date='+start_date+stop_date+instrument
+
     try:
         response = requests.get(http)
-    except:
+        print(response.text)
+    except Exception:
         raise ConnectionError('There is no internet connection')
     return response
 
@@ -107,5 +110,6 @@ def download_isa(filename, save_dir=''):
         raise ConnectionError('There is no internet connection')
     if response.status_code != 200:
         raise ValueError('File name is not valid, retype the valid file name')
+
     path = Path(save_dir+filename)
     path.write_bytes(response.content)

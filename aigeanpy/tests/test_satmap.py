@@ -182,10 +182,6 @@ def test_add_two_SatMap_generate_correct_added_SatMap():
     # set the other satmap to be the same date, but contains a map with different shape
     fand2.meta['obs_date'] = '2023-01-04 14:53:10'
     actual = fand1 + fand2
-    # dict = {'archive': 'ISA', 'instrument': 'Fand', 'observatory': 'Aigean',
-    #         'resolution': 5, 'xcoords': (450, 675), 'ycoords': (150, 200), 'obs_date': '2023-01-04 15:00:10'}
-    # dict = {'archive': 'ISA', 'instrument': 'Lir', 'observatory': 'Aigean',
-    #         'resolution': 5, 'xcoords': (100, 700), 'ycoords': (0, 300), 'obs_date': '2023-01-04 14:53:10'}
     expected_centre = (637, 175)
     assert actual.centre == expected_centre
 
@@ -252,19 +248,22 @@ def test_mosaic_include_type_generate_correct_centre_with_padding_to_be_False():
     mock_lir = _get_lir(lir_file)
 
     actual = mock_fand.mosaic(mock_lir, padding=False)
-    expected = (525, 150)
+    expected = (400, 150)
     assert actual.centre == expected
 
-# def test_mosaic_intersect_type_generate_correct_centre_with_padding_to_be_False():
-#
-#     fand_file = 'aigean_fan_20230104_150010.zip'
-#     fand1 = _get_fand(fand_file)
-#     fand_file2 = 'aigean_fan_20230112_074702.zip'
-#     fand2 = _get_fand(fand_file2)
-#
-#     actual = fand1.mosaic(fand2, padding=False)
-#     expected = (637, 175)
-#     assert actual.centre == expected
+def test_mosaic_intersect_type_generate_correct_centre_with_padding_to_be_False():
+
+    fand_file = 'aigean_fan_20230104_150010.zip'
+    fand1 = _get_fand(fand_file)
+    fand_file2 = 'aigean_fan_20230112_074702.zip'
+    fand2 = _get_fand(fand_file2)
+
+    # set fand2 to be in the same day
+    fand2.meta['obs_date'] = '2023-01-04 14:53:10'
+
+    actual = fand1.mosaic(fand2, padding=False)
+    expected = (637, 175)
+    assert actual.centre == expected
 
 def test_mosaic_generate_correct_centre_with_padding_to_be_True():
     fand_file = 'aigean_fan_20230104_150010.zip'
@@ -276,3 +275,8 @@ def test_mosaic_generate_correct_centre_with_padding_to_be_True():
     expected = (400, 150)
     assert actual.centre == expected
 
+def test_visualise_savepath_should_be_str():
+    fand_file = 'aigean_fan_20230104_150010.zip'
+    mock_fand = _get_fand(fand_file)
+    with pytest.raises(TypeError) as err:
+        mock_fand.visualise(save_path=123)

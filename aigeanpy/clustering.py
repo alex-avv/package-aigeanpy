@@ -1,7 +1,31 @@
 from math import sqrt
 from random import randrange
-import sys
 
+def cluster(filename, clusters: int = 3, iterations: int = 3) -> list:
+
+  lines = tool4kmeans.file_reading(filename)
+
+  global process_data
+  global central_point
+
+  process_data = tool4kmeans.data_loading(lines)
+
+  central_point = tool4kmeans.create_random_point(process_data,clusters) # random find the piont in dataset
+
+  alloc=[]
+  n=0
+  while n<iterations:
+    for point in process_data:
+      #find each distance to the random point of each point
+      Ldistance = tool4kmeans.distance2points(point,central_point)
+      alloc.append(tool4kmeans.min_index(Ldistance))# find the min distance index
+    for g in range(clusters):
+      alloc_process_data=tool4kmeans.group_datas(g,process_data,alloc)
+      new_mean=(sum([a[0] for a in alloc_process_data]) / len(alloc_process_data), sum([a[1] for a in alloc_process_data]) / len(alloc_process_data), sum([a[2] for a in alloc_process_data]) / len(alloc_process_data))
+      central_point[g]=new_mean
+    n=n+1
+
+  return alloc
 
 
 class tool4kmeans:
@@ -37,48 +61,21 @@ class tool4kmeans:
     return group_data
 
 
-def cluster(filename, clusters: int, iterations: int ) -> list:
-  global clusters
-  clusters = clusters
+if __name__ == "__main__":
 
-  lines = tool4kmeans.file_reading(filename)
+  import argparse
 
-  global process_data
-  global central_point
+  parse = argparse.ArgumentParser(description= 'set argument')
+  parse.add_argument('file_path', type = str ,help = ' file of data')
+  parse.add_argument('--clusters',default = 3, type = int, help = ' clusters of k_means' )
+  parse.add_argument('--iters', default= 10, type = int, help = ' iteration of k_means')
+  args = parse.parse_args()
+  print(args.file_path)
 
-  process_data = tool4kmeans.data_loading(lines)
+  alloc = cluster(args.file_path,args.clusters,args.iters)
 
-  central_point = tool4kmeans.create_random_point(process_data,clusters) # random find the piont in dataset
+  for g in range(args.clusters):
+    alloc_process_data = tool4kmeans.group_datas(g,process_data,alloc)
+    print("Cluster " + str(g) + " is centred at " + str(central_point[g]) + " and has " + str(len(alloc_process_data)) + " points.")
 
-  alloc=[]
-  n=0
-  while n<iterations:
-    for point in process_data:
-      #find each distance to the random point of each point
-      Ldistance = tool4kmeans.distance2points(point,central_point)
-      alloc.append(tool4kmeans.min_index(Ldistance))# find the min distance index
-    for g in range(clusters):
-      alloc_process_data=tool4kmeans.group_datas(g,process_data,alloc)
-      new_mean=(sum([a[0] for a in alloc_process_data]) / len(alloc_process_data), sum([a[1] for a in alloc_process_data]) / len(alloc_process_data), sum([a[2] for a in alloc_process_data]) / len(alloc_process_data))
-      central_point[g]=new_mean
-    n=n+1
-
-  return alloc
-
-clusters = 3
-#interations =10
-file_path = sys.argv[1]
-
-alloc = cluster(file_path,3,10)
-
-"""lines = tool4kmeans.file_reading(file_path)
-
-process_data = tool4kmeans.data_loading(lines)
-
-central_point=tool4kmeans.create_random_point(process_data,clusters)
-"""
-for g in range(clusters):
-  alloc_process_data = tool4kmeans.group_datas(g,process_data,alloc)
-  print("Cluster " + str(g) + " is centred at " + str(central_point[g]) + " and has " + str(len(alloc_process_data)) + " points.")
-
-  print(alloc_process_data)
+    print(alloc_process_data)

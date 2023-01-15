@@ -1,6 +1,14 @@
+import json
+import h5py
+import asdf
+import zipfile
 import numpy as np
+from io import BytesIO
+from matplotlib import pyplot as plt
+import skimage
 from skimage import transform
 import os
+from pathlib import Path
 
 
 def earth_to_pixel_tuple(x, y, resolution):
@@ -98,14 +106,169 @@ def pixel_to_earth(x, y, resolution):
     """
     return x * resolution, y * resolution
 
+class SatMapFactory():
+    def get_satmap_obj(self, filename):
+        """create a SatMap object through data file for SatMap factory
 
-def get_satmap(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
-    '''
-    Docstring
-    '''
+            Parameters
+            ----------
+            filename : str
+                the name of the file holding the data information
 
-    ...
-    raise NotImplementedError
+            Returns
+            -------
+            SatMap
+                generate a a SatMap object
+
+            Raises
+            ------
+            ValueError
+                File must match given file name
+            """
+        meta = {}
+        data = []
+        file_path_abs = None
+        try:
+            file_path_abs = sorted(Path().rglob(filename))[0]
+        except IndexError as e:
+            raise ValueError("No matching file can be found")
+
+        satmap = None
+
+        # if it is a HDF5 file, call the get_hdf5 function
+        if 'hdf5' in filename:
+            meta, data = get_hdf5(file_path_abs)
+            satmap = Manannan(meta, data)
+
+        # if it is a ASDF file, call the get_asdf function
+        elif 'asdf' in filename:
+            meta, data = get_asdf(file_path_abs)
+            satmap = Lir(meta, data)
+
+        # if it is a zip file, call the get_zip function
+        elif 'zip' in filename:
+            meta, data = get_zip(file_path_abs)
+            satmap = Fand(meta, data)
+
+        return satmap
+
+
+def get_satmap(filename):
+    """create a SatMap object through SatMap Factory
+
+    Parameters
+    ----------
+    filename : str
+        the name of the file holding the data information
+
+    Returns
+    -------
+    SatMap
+        generate a a SatMap object
+    """
+    # create a SatMap object calling SatMap Factory
+    satMapFactory = SatMapFactory()
+
+    satmap = satMapFactory.get_satmap_obj(filename)
+
+    return satmap
+
+
+def get_hdf5(file_path):
+    """get meta and data from file
+
+    Parameters
+    ----------
+    file_path : str
+        the file path of the file holding the data information
+
+    Returns
+    -------
+    dict
+        including info of data. keys including ('archive','instrument','observatory','resolution','xcoords','ycoords','obs_time')
+    array
+        data array
+    """    
+    with h5py.File(file_path, 'r') as f:
+        for key in f.keys():
+            data = np.array(f[key]['data'])
+            meta = meta_generate(f[key].attrs)
+    return meta, data
+
+
+def get_asdf(file_path):
+    """get meta and data from file
+
+    Parameters
+    ----------
+    file_path : str
+        the file path of the file holding the data information
+
+    Returns
+    -------
+    dict
+        including info of data. keys including ('archive','instrument','observatory','resolution','xcoords','ycoords','obs_time')
+    array
+        data array
+    """     
+    with asdf.open(file_path, 'r') as f:
+        meta = meta_generate(f)
+        data = np.array(f['data'])
+    return meta, data
+
+
+def get_zip(file_path):
+    """get meta and data from file
+
+    Parameters
+    ----------
+    file_path : str
+        the file path of the file holding the data information
+
+    Returns
+    -------
+    dict
+        including info of data. keys including ('archive','instrument','observatory','resolution','xcoords','ycoords','obs_time')
+    array
+        data array
+    """    
+    with zipfile.ZipFile(file_path, 'r') as f:
+        file_json = json.load(BytesIO(f.read(f.namelist()[2])))
+        meta = meta_generate(file_json)
+        data = np.load(BytesIO(f.read(f.namelist()[4])))
+    return meta, data
+
+
+def meta_generate(meta_origin):
+    """generate meta data
+
+    Parameters
+    ----------
+    meta_origin : dict
+        a dict with multiple informations
+
+    Returns
+    -------
+    dict
+        a dict including info of data. keys including ('archive','instrument','observatory','resolution','xcoords','ycoords','obs_time')
+    """    
+    meta = {}
+    # meta contain following keys
+    meta_list = ['archive','instrument','observatory','resolution','xcoords','ycoords']
+    for key in meta_list:
+        # update the information to the meta
+        try:
+            meta.update({key:meta_origin[key]})
+        # update with an empty value if the file do not contain the key
+        except:
+            meta.update({key:''})
+
+    # change coords into tuple, the type of each element is int
+    meta['xcoords'] = tuple(map(int,meta['xcoords']))
+    meta['ycoords'] = tuple(map(int,meta['ycoords']))
+    # combine the date and time
+    meta.update({'obs_date':meta_origin['date']+' '+meta_origin['time']})
+    return meta
 
 
 class SatMap:
@@ -478,3 +641,12 @@ class SatMap:
         # For printing object information
         # using >>> print(SatMap object)?
         pass
+
+class Lir(SatMap):
+    pass
+
+class Manannan(SatMap):
+    pass
+
+class Fand(SatMap):
+    pass

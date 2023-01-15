@@ -5,13 +5,14 @@ def cluster(filename, clusters: int = 3, iterations: int = 3) -> list:
 
   lines = tool4kmeans.file_reading(filename)
 
-  global process_data
-  global central_point
+  if __name__ == "__main__":
+      global process_data
+      global central_point
 
   process_data = tool4kmeans.data_loading(lines)
 
   central_point = tool4kmeans.create_random_point(process_data,clusters) # random find the piont in dataset
-
+  
   alloc=[]
   n=0
   while n<iterations:
@@ -69,13 +70,32 @@ if __name__ == "__main__":
   parse.add_argument('file_path', type = str ,help = ' file of data')
   parse.add_argument('--clusters',default = 3, type = int, help = ' clusters of k_means' )
   parse.add_argument('--iters', default= 10, type = int, help = ' iteration of k_means')
+  parse.add_argument('--showclusters', default = False, type = bool, help=' show the visual clusters or not')
+  parse.add_argument('--plotclusters', default = False, type = bool, help =' plot the visual clusters or not')
+
   args = parse.parse_args()
-  print(args.file_path)
 
   alloc = cluster(args.file_path,args.clusters,args.iters)
 
-  for g in range(args.clusters):
-    alloc_process_data = tool4kmeans.group_datas(g,process_data,alloc)
-    print("Cluster " + str(g) + " is centred at " + str(central_point[g]) + " and has " + str(len(alloc_process_data)) + " points.")
+  if args.showclusters == True:
 
-    print(alloc_process_data)
+    for g in range(args.clusters):
+      alloc_process_data = tool4kmeans.group_datas(g,process_data,alloc)
+      print("Cluster " + str(g) + " is centred at " + str(central_point[g]) + " and has " + str(len(alloc_process_data)) + " points.")
+
+      print(alloc_process_data)
+
+
+
+  if args.plotclusters == True:
+
+    from matplotlib import pyplot as plt
+
+    fig = plt.figure()
+    ax = fig.add_subplot(projection='3d')
+
+    for i in range(args.clusters):
+      alloc_ps = tool4kmeans.group_datas(i,process_data,alloc)
+      ax.scatter([a[0] for a in alloc_ps],[a[1] for a in alloc_ps],[a[2] for a in alloc_ps])
+    
+    plt.show()

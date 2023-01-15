@@ -1,13 +1,37 @@
-def cluster(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
-    '''
-    Docstring
-    '''
+from math import *
+from random import *
+import sys
 
-    ...
-    raise NotImplementedError
+k=3
+
+lines = open(sys.argv[1], 'r').readlines()
 
 
-if __name__ == "__main__":
 
-    # Command line interface
-    raise NotImplementedError
+
+ps=[]
+for line in lines: ps.append(tuple(map(float, line.strip().split(','))))
+
+m=[ps[randrange(len(ps))], ps[randrange(len(ps))], ps[randrange(len(ps))]]
+
+alloc=[None]*len(ps)
+n=0
+while n<10:
+  for i in range(len(ps)):
+    p=ps[i]
+    d=[None] * 3
+    d[0]=sqrt((p[0]-m[0][0])**2 + (p[1]-m[0][1])**2 + (p[2]-m[0][2])**2)
+    d[1]=sqrt((p[0]-m[1][0])**2 + (p[1]-m[1][1])**2 + (p[2]-m[1][2])**2)
+    d[2]=sqrt((p[0]-m[2][0])**2 + (p[1]-m[2][1])**2 + (p[2]-m[2][2])**2)
+    alloc[i]=d.index(min(d))
+  for i in range(3):
+    alloc_ps=[p for j, p in enumerate(ps) if alloc[j] == i]
+    new_mean=(sum([a[0] for a in alloc_ps]) / len(alloc_ps), sum([a[1] for a in alloc_ps]) / len(alloc_ps), sum([a[2] for a in alloc_ps]) / len(alloc_ps))
+    m[i]=new_mean
+  n=n+1
+
+for i in range(3):
+  alloc_ps=[p for j, p in enumerate(ps) if alloc[j] == i]
+  print("Cluster " + str(i) + " is centred at " + str(m[i]) + " and has " + str(len(alloc_ps)) + " points.")
+
+  print(alloc_ps)

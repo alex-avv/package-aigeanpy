@@ -1,6 +1,7 @@
 import numpy as np
 from skimage import transform
 import os
+from matplotlib import pyplot as plt
 
 def earth_to_pixel_tuple(x, y, resolution):
     """change earth coordinate to pixel coordinate
@@ -24,7 +25,7 @@ def earth_to_pixel_tuple(x, y, resolution):
     # change earth coords to the pixel coords by dividing resolution and move the coords to the origin
     pixel_xcoords = (earth_to_pixel(x[0], y[0], resolution)[0], earth_to_pixel(x[1], y[1], resolution)[0])
     # Filp the Y-axis to achieve: In the top-left corner and positive y-values going downwards. 
-    pixel_ycoords = (abs(earth_to_pixel(x[1], y[1], resolution)[1]), abs(earth_to_pixel(x[0], y[0], resolution)[1]))
+    pixel_ycoords = (earth_to_pixel(x[0], y[0], resolution)[1], earth_to_pixel(x[1], y[1], resolution)[1])
     return pixel_xcoords, pixel_ycoords
 
 def earth_to_pixel(x, y, resolution):
@@ -159,14 +160,14 @@ class SatMap:
             raise TypeError('Another_satmap must in SatMap type')
         if self.meta['resolution'] != another_satmap.meta['resolution']:
             raise ValueError('Different instrument cannot be added')
-        if self.meta['obs_time'][:10] != another_satmap.meta['obs_time'][:10]:
+        if self.meta['obs_date'][:10] != another_satmap.meta['obs_date'][:10]:
             raise ValueError('2 data must in the same day')
 
         # earth coords of the new object
         data_ex = (min(self.meta['xcoords'][0], another_satmap.meta['xcoords'][0]),max(self.meta['xcoords'][1], another_satmap.meta['xcoords'][1]))
         data_ey = (min(self.meta['ycoords'][0], another_satmap.meta['ycoords'][0]),max(self.meta['ycoords'][1], another_satmap.meta['ycoords'][1]))
-        # earth distance from new object top left to the origin(0,0)
-        offset = (data_ex[0],data_ey[1])
+        # earth distance from new object bottom left to the origin(0,0)
+        offset = (data_ex[0],data_ey[0])
         # get resolution from object
         resolution =  self.meta['resolution']
 
@@ -174,9 +175,9 @@ class SatMap:
         data_ex_offset = (data_ex[0]-offset[0], data_ex[1]-offset[0])
         data_ey_offset = (data_ey[0]-offset[1], data_ey[1]-offset[1])
         self_ex_offset = (self.meta['xcoords'][0]-offset[0], self.meta['xcoords'][1]-offset[0])
-        self_ey_offset = (self.meta['ycoords'][0]-offset[0], self.meta['ycoords'][1]-offset[0])
+        self_ey_offset = (self.meta['ycoords'][0]-offset[1], self.meta['ycoords'][1]-offset[1])
         another_ex_offset = (another_satmap.meta['xcoords'][0]-offset[0], another_satmap.meta['xcoords'][1]-offset[0])
-        another_ey_offset = (another_satmap.meta['ycoords'][0]-offset[0], another_satmap.meta['ycoords'][1]-offset[0])
+        another_ey_offset = (another_satmap.meta['ycoords'][0]-offset[1], another_satmap.meta['ycoords'][1]-offset[1])
 
         # change earth coords to pixel coords
         data_px, data_py = earth_to_pixel_tuple(data_ex_offset, data_ey_offset, resolution)
@@ -197,7 +198,7 @@ class SatMap:
         setmap  = type(self)(meta, data)
         setmap.extra = True
         return setmap
-
+    
     def __sub__(self, another_satmap):
         """do the object subtract
 
@@ -227,15 +228,15 @@ class SatMap:
             raise TypeError('Another_satmap must in SatMap type')
         if self.meta['resolution'] != another_satmap.meta['resolution']:
             raise ValueError('Different instrument cannot be added')
-        if self.meta['obs_time'][:10] == another_satmap.meta['obs_time'][:10]:
+        if self.meta['obs_date'][:10] == another_satmap.meta['obs_date'][:10]:
             raise ValueError('2 data must in different days')
         # earth coords of the new object
         data_ex = (max(self.meta['xcoords'][0], another_satmap.meta['xcoords'][0]),min(self.meta['xcoords'][1], another_satmap.meta['xcoords'][1]))
         data_ey = (max(self.meta['ycoords'][0], another_satmap.meta['ycoords'][0]),min(self.meta['ycoords'][1], another_satmap.meta['ycoords'][1]))
         if not (data_ex[1]>data_ex[0] & data_ey[1]>data_ey[0]):
             raise ValueError('Two data must overlap')
-        # earth distance from new object top left to the origin(0,0)
-        offset = (data_ex[0],data_ey[1])
+        # earth distance from new object bottom left to the origin(0,0)
+        offset = (data_ex[0],data_ey[0])
         # get resolution from object
         resolution =  self.meta['resolution']
 
@@ -243,9 +244,9 @@ class SatMap:
         data_ex_offset = (data_ex[0]-offset[0], data_ex[1]-offset[0])
         data_ey_offset = (data_ey[0]-offset[1], data_ey[1]-offset[1])
         self_ex_offset = (self.meta['xcoords'][0]-offset[0], self.meta['xcoords'][1]-offset[0])
-        self_ey_offset = (self.meta['ycoords'][0]-offset[0], self.meta['ycoords'][1]-offset[0])
+        self_ey_offset = (self.meta['ycoords'][0]-offset[1], self.meta['ycoords'][1]-offset[1])
         another_ex_offset = (another_satmap.meta['xcoords'][0]-offset[0], another_satmap.meta['xcoords'][1]-offset[0])
-        another_ey_offset = (another_satmap.meta['ycoords'][0]-offset[0], another_satmap.meta['ycoords'][1]-offset[0])
+        another_ey_offset = (another_satmap.meta['ycoords'][0]-offset[1], another_satmap.meta['ycoords'][1]-offset[1])
 
         # change earth coords to pixel coords
         data_px, data_py = earth_to_pixel_tuple(data_ex_offset, data_ey_offset, resolution)

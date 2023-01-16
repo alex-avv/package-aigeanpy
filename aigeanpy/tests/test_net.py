@@ -1,9 +1,8 @@
+# Disabling no-value-for-parameter
+# pylint: disable = E1120
 import requests
 from unittest.mock import patch
-from pathlib import Path
-import datetime
 import pytest
-import mock
 
 from aigeanpy.net import query_isa, download_isa
 

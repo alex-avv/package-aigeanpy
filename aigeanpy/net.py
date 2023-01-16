@@ -42,11 +42,11 @@ def query_isa(start_date=Current_time, stop_date=Current_time, instrument=''):
     ConnectionError
         There is no internet connection
     """    
-    if type(start_date) is not str:
+    if not isinstance(start_date, str):
         raise TypeError('Start data must in str type')
-    if type(stop_date) is not str:
+    if not isinstance(stop_date, str):
         raise TypeError('Stop data must in str type')
-    if type(instrument) is not str:
+    if not isinstance(instrument, str):
         raise TypeError('Instrument must in str type')
     # connection error
     try:

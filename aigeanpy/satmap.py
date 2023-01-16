@@ -1,3 +1,7 @@
+# Disabling missing-class-docstring, consider-using-dict-items,
+# too-many-branches, too-many-locals, too-many-statements, unused-import and
+# bare-except
+# pylint: disable = C0115, C0206, R0912, R0914, R0915, W0611, W0702
 import json
 import h5py
 import asdf
@@ -350,9 +354,9 @@ class SatMap:
         TypeError
             Data must in np.ndarray type
         """
-        if type(meta) is not dict:
+        if not isinstance(meta, dict):
             raise TypeError('Meta must in dict type')
-        if type(data) is not np.ndarray:
+        if not isinstance(data, np.ndarray):
             raise TypeError('Data must in np.ndarray type')
         self.meta = meta
         self.data = data
@@ -569,7 +573,7 @@ class SatMap:
             raise ValueError('Two data must overlap')
 
         # if the resolution is not specified, choose the smaller resolution
-        if resolution == None:
+        if resolution is None:
             resolution = min(self.meta['resolution'], another_satmap.meta['resolution'])
         else:
             if isinstance(resolution, int):
@@ -695,7 +699,7 @@ class SatMap:
         TypeError
             Save_path must be a str
         """
-        if type(save) is not bool:
+        if not isinstance(save, bool):
             raise TypeError('Save must in bool type')
         if not isinstance(save_path, str):
             raise TypeError('Save_path must be a str')

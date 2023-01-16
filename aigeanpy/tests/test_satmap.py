@@ -1,6 +1,8 @@
+# Disabling missing-class-docstring, pointless-statement, redefined-builtin and
+# and bare-except
+# pylint: disable = C0115, W0104, W0622, W0702
 import pytest
 import json
-import h5py
 import asdf
 import zipfile
 import numpy as np

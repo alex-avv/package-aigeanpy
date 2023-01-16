@@ -34,11 +34,3 @@ the `Irish Space Agency webservice archive <https://dokku-app.dokku.arc.ucl.ac.u
    content/tutorial
    content/modules
    content/developer_guide
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

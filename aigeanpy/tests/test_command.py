@@ -1,6 +1,7 @@
 # Disabling missing-function-docstring error
 # pylint: disable = C0116
-from pathlib import Path; TEST_DIR = Path(__file__).parent
+from pathlib import Path; import os; 
+CWD = Path(os.getcwd()); TEST_DIR = Path(__file__).parent
 import yaml, json
 from pytest import mark, raises
 import subprocess
@@ -44,19 +45,37 @@ def get_satmap_mock(filename):
 
     return MockClass(meta)
 
+
 @mark.parametrize('test_name', fixtures['output_info'])
 def test_output_info(capsys, test_name):
     properties = list(test_name.values())[0]
     files = properties['parameters']
     expected_output = properties['expected_value']
+
+    # Capturing expected print-out message
+    sys.stdout.write(expected_output)
+    expected_print = capsys.readouterr().out
+
+    # Asserting print-out message when calling output_info is as expected
+    output_info(files, get_satmap_mock, TEST_DIR)
+    assert capsys.readouterr().out == expected_print
+
+
+@mark.parametrize('test_name', fixtures['metadata'])
+def test_metadata(capsys, test_name):
+    properties = list(test_name.values())[0]
+    parameters = properties['parameters']
+    expected_output = properties['expected_value']
     
     # Capturing expected print-out message
     sys.stdout.write(expected_output)
     expected_print = capsys.readouterr().out
-       
+
     # Asserting print-out message when calling output_info is as expected
-    output_info(files, get_satmap_mock, TEST_DIR)
-    assert capsys.readouterr().out == expected_print
+    os.chdir(TEST_DIR)
+    output_print = check_output(parameters).decode("utf-8").replace('\r','')
+    os.chdir(CWD)
+    assert output_print == expected_print   
 
 
 #~~~ AIGEAN_MOSAIC TESTS ~~~#

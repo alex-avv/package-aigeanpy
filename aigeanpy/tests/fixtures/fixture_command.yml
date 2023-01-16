@@ -53,3 +53,51 @@ output_info:
         xcoords: (675, 900)
         ycoords: (350, 400)
         obs_date: 2022-12-15 09:58:30
+
+metadata:
+  - general:
+      parameters:
+        - aigean_metadata
+        - extra_aigean_files/aigean_fan_20230113_070916.zip  # This file is corrupted
+        - aigean_fan_20230104_150010.zip
+        - aigean_lir_20230104_145310.asdf
+        - aigean_ecn_20230104_145310.csv  # This is an Ecne CSV file
+        - aigean_fan_20230112_074702.zip
+        - aigean_man_20221205_194510.hdf5
+        - foo.py  # This is a non-existent file
+      expected_value: |
+        aigean_fan_20230104_150010.zip:archive: ISA
+        aigean_fan_20230104_150010.zip:instrument: Fand
+        aigean_fan_20230104_150010.zip:observatory: Aigean
+        aigean_fan_20230104_150010.zip:resolution: 5
+        aigean_fan_20230104_150010.zip:xcoords: (450, 675)
+        aigean_fan_20230104_150010.zip:ycoords: (150, 200)
+        aigean_fan_20230104_150010.zip:obs_date: 2023-01-04 15:00:10
+        aigean_lir_20230104_145310.asdf:archive: ISA
+        aigean_lir_20230104_145310.asdf:instrument: Lir
+        aigean_lir_20230104_145310.asdf:observatory: Aigean
+        aigean_lir_20230104_145310.asdf:resolution: 30
+        aigean_lir_20230104_145310.asdf:xcoords: (100, 700)
+        aigean_lir_20230104_145310.asdf:ycoords: (0, 300)
+        aigean_lir_20230104_145310.asdf:obs_date: 2023-01-04 14:53:10
+        aigean_fan_20230112_074702.zip:archive: ISA
+        aigean_fan_20230112_074702.zip:instrument: Fand
+        aigean_fan_20230112_074702.zip:observatory: Aigean
+        aigean_fan_20230112_074702.zip:resolution: 5
+        aigean_fan_20230112_074702.zip:xcoords: (600, 825)
+        aigean_fan_20230112_074702.zip:ycoords: (150, 200)
+        aigean_fan_20230112_074702.zip:obs_date: 2023-01-12 07:47:02
+        aigean_man_20221205_194510.hdf5:archive: <No information available>
+        aigean_man_20221205_194510.hdf5:instrument: Manannan
+        aigean_man_20221205_194510.hdf5:observatory: Aigean
+        aigean_man_20221205_194510.hdf5:resolution: 15
+        aigean_man_20221205_194510.hdf5:xcoords: (750, 1200)
+        aigean_man_20221205_194510.hdf5:ycoords: (250, 400)
+        aigean_man_20221205_194510.hdf5:obs_date: 2022-12-05 19:45:10
+
+        These files failed while being processed
+         - extra_aigean_files/aigean_fan_20230113_070916.zip
+         - aigean_ecn_20230104_145310.csv
+
+        These files couldn't be found
+         - foo.py

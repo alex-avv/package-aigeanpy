@@ -5,4 +5,3 @@ Aigeanpy Docstrings
    :maxdepth: 4
 
    aigeanpy
-   setup

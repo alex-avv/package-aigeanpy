@@ -19,7 +19,7 @@ This page is a guide for those developers who want to contribute to the Aigeanpy
 
         git checkout -b <new-branch-name>
     
-4.  Fully document your code using docstrings follwoing the `numpy format <https://numpydoc.readthedocs.io/en/latest/format.html>`_.
+4.  Fully document your code using docstrings following the `numpy format <https://numpydoc.readthedocs.io/en/latest/format.html>`_.
 
 5.  Move into the aigeanpy directory and run pytest in the terminal.
 
@@ -29,4 +29,6 @@ This page is a guide for those developers who want to contribute to the Aigeanpy
 
 6.  Push your branch to your fork on Github. When creating commit messages please follow the `style guide <https://medium.com/swlh/writing-better-commit-messages-9b0b6ff60c67>`_.
 
-7.  
+7.  Create a new pull request targeting the master branch of the aigeanpy library.
+
+    *   Please link issues, use relevant tags and use an appropriate title that summarises your changes concisely.

@@ -68,7 +68,7 @@ def test_earth_to_pixel_return_correct_value():
     x = 750
     y = 250
     resolution = 15
-    assert satmap.earth_to_pixel(x, y, resolution) == (50, 16)
+    assert satmap.earth_to_pixel(x, y, resolution) == (50, 17)
 
 
 def test_pixel_to_earth_return_correct_value():

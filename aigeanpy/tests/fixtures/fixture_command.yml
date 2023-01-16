@@ -1,0 +1,55 @@
+output_info:
+  - multiple_case:
+      parameters:
+        - extra_aigean_files/empty/aigean_lir_20221205_194510.asdf
+        - extra_aigean_files/empty/aigean_man_20221210_150120.hdf5
+        - extra_aigean_files/empty/aigean_fan_20221215_095830.zip
+        - extra_aigean_files/empty/aigean_fan_20221220_054440.zip
+        - fixtures/fixture_command.yml
+        - extra_aigean_files/empty/foo.zip
+      expected_value: |
+        extra_aigean_files/empty/aigean_lir_20221205_194510.asdf:archive: ISA
+        extra_aigean_files/empty/aigean_lir_20221205_194510.asdf:instrument: Lir
+        extra_aigean_files/empty/aigean_lir_20221205_194510.asdf:observatory: Aigean
+        extra_aigean_files/empty/aigean_lir_20221205_194510.asdf:resolution: 30
+        extra_aigean_files/empty/aigean_lir_20221205_194510.asdf:xcoords: (800, 1400)
+        extra_aigean_files/empty/aigean_lir_20221205_194510.asdf:ycoords: (100, 400)
+        extra_aigean_files/empty/aigean_lir_20221205_194510.asdf:obs_date: 2022-12-05 19:45:10
+        extra_aigean_files/empty/aigean_man_20221210_150120.hdf5:archive: <No information available>
+        extra_aigean_files/empty/aigean_man_20221210_150120.hdf5:instrument: Manannan
+        extra_aigean_files/empty/aigean_man_20221210_150120.hdf5:observatory: Aigean
+        extra_aigean_files/empty/aigean_man_20221210_150120.hdf5:resolution: 15
+        extra_aigean_files/empty/aigean_man_20221210_150120.hdf5:xcoords: (750, 1200)
+        extra_aigean_files/empty/aigean_man_20221210_150120.hdf5:ycoords: (200, 350)
+        extra_aigean_files/empty/aigean_man_20221210_150120.hdf5:obs_date: 2022-12-10 15:01:20
+        extra_aigean_files/empty/aigean_fan_20221215_095830.zip:archive: ISA
+        extra_aigean_files/empty/aigean_fan_20221215_095830.zip:instrument: Fand
+        extra_aigean_files/empty/aigean_fan_20221215_095830.zip:observatory: Aigean
+        extra_aigean_files/empty/aigean_fan_20221215_095830.zip:resolution: 5
+        extra_aigean_files/empty/aigean_fan_20221215_095830.zip:xcoords: (675, 900)
+        extra_aigean_files/empty/aigean_fan_20221215_095830.zip:ycoords: (350, 400)
+        extra_aigean_files/empty/aigean_fan_20221215_095830.zip:obs_date: 2022-12-15 09:58:30
+        extra_aigean_files/empty/aigean_fan_20221220_054440.zip:archive: ISA
+        extra_aigean_files/empty/aigean_fan_20221220_054440.zip:instrument: Fand
+        extra_aigean_files/empty/aigean_fan_20221220_054440.zip:observatory: Aigean
+        extra_aigean_files/empty/aigean_fan_20221220_054440.zip:resolution: 5
+        extra_aigean_files/empty/aigean_fan_20221220_054440.zip:xcoords: (1050, 1275)
+        extra_aigean_files/empty/aigean_fan_20221220_054440.zip:ycoords: (350, 400)
+        extra_aigean_files/empty/aigean_fan_20221220_054440.zip:obs_date: 2022-12-20 05:44:40
+        
+        These files failed while being processed
+         - fixtures/fixture_command.yml
+        
+        These files couldn't be found
+         - extra_aigean_files/empty/foo.zip
+  - single_case:
+      parameters: 
+        - extra_aigean_files/empty/aigean_fan_20221215_095830.zip
+      expected_value: |
+        archive: ISA
+        instrument: Fand
+        observatory: Aigean
+        resolution: 5
+        xcoords: (675, 900)
+        ycoords: (350, 400)
+        obs_date: 2022-12-15 09:58:30

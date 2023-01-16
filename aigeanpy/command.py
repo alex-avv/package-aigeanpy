@@ -121,13 +121,20 @@ def today(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
     raise NotImplementedError
 
 
-def metadata(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
+def metadata():
     '''
     Docstring
     '''
 
-    ...
-    raise NotImplementedError
+    parser = ArgumentParser(description="Shows the metadata information of "
+                            "the specified file(s).",
+                            formatter_class=ArgumentDefaultsHelpFormatter)
+    parser.add_argument('files', nargs='+', metavar='<filename>',
+                        help="Name of the file(s).")
+    arguments = parser.parse_args()
+    files = arguments.files
+    
+    output_info(files, get_satmap, CWD)
 
 
 def mosaic():

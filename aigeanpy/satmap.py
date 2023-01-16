@@ -632,7 +632,7 @@ class SatMap:
             resolution = min(self.meta['resolution'],
                              another_satmap.meta['resolution'])
         else:
-            if isinstance(resolution, int):
+            if not isinstance(resolution, int):
                 raise TypeError('Resolution must be int type')
             if resolution <= 0:
                 raise ValueError('Resolution must larger than 0')

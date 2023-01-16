@@ -1,16 +1,62 @@
 # Disabling missing-function-docstring error
 # pylint: disable = C0116
 from pathlib import Path; TEST_DIR = Path(__file__).parent
-import yaml
+import yaml, json
 from pytest import mark, raises
+import subprocess
+from subprocess import check_output
+import sys
 import numpy as np
 from aigeanpy.satmap import get_satmap
-from aigeanpy.command import unordered_mosaic
+from aigeanpy.command import unordered_mosaic, output_info
 
 
 with open(TEST_DIR/'fixtures/fixture_command.yml', 'r',
           encoding="utf-8") as yml_fixtures:
     fixtures = yaml.safe_load(yml_fixtures)
+
+
+#~~~ AIGEAN_METADATA TESTS ~~~#
+# Mocking aigeanpy.satmap.get_satmap function which requires to open files. 
+# Returns 'SatMap' object with only-defined meta member variable.
+# With Aigean observations from the 05/Dec/2022 to the 20/Dec/2022
+def get_satmap_mock(filename):
+    with open(TEST_DIR/'extra_aigean_files/metadata_sample.json', 'r',
+              encoding="utf-8") as json_metadata:
+        dict_metadata = json.load(json_metadata)
+    
+    meta = dict_metadata[f'{filename}']
+    # Changing the x- and y-coordinates (stored in the JSON file as lists) to
+    # tuples
+    for key in meta:
+        if key not in ['archive', 'instrument', 'observatory', 'resolution',
+                       'xcoords', 'ycoords', 'obs_date']:
+            raise TypeError
+        elif f'{key}' == 'xcoords':
+            meta['xcoords'] = tuple(meta['xcoords'])
+        elif f'{key}' == 'ycoords':
+            meta['ycoords'] = tuple(meta['ycoords'])   
+
+    # Defining mock class
+    class MockClass:
+        def __init__(self, meta):
+            self.meta = meta
+
+    return MockClass(meta)
+
+@mark.parametrize('test_name', fixtures['output_info'])
+def test_output_info(capsys, test_name):
+    properties = list(test_name.values())[0]
+    files = properties['parameters']
+    expected_output = properties['expected_value']
+    
+    # Capturing expected print-out message
+    sys.stdout.write(expected_output)
+    expected_print = capsys.readouterr().out
+       
+    # Asserting print-out message when calling output_info is as expected
+    output_info(files, get_satmap_mock, TEST_DIR)
+    assert capsys.readouterr().out == expected_print
 
 
 #~~~ AIGEAN_MOSAIC TESTS ~~~#

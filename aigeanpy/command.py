@@ -51,7 +51,7 @@ def output_info(files, get_satmap, DIR):
 
     failed = ''
     missing = ''
-    
+
     for file in files:
         # Try processing the file, if not store the missing/failed file name
         try:
@@ -64,13 +64,13 @@ def output_info(files, get_satmap, DIR):
             else:
                 failed += f' - {file}\n'
             meta = None
-        
+
         if meta:
             # Replacing empty data with informative message
             for key in meta:
                 if meta[f'{key}'] == '':
                     meta[f'{key}'] = '<No information available>'
-            
+
             # Printing screen information
             if len(files) == 1:
                 for key in meta:
@@ -80,7 +80,7 @@ def output_info(files, get_satmap, DIR):
                 for key in meta:
                     value = meta[f'{key}']
                     sys.stdout.write(f'{file}:{key}: {value}\n')
-    
+
     # Print messages with missing/failed files
     if failed:
         sys.stdout.write("\nThese files failed while being processed\n"
@@ -89,7 +89,7 @@ def output_info(files, get_satmap, DIR):
         sys.stdout.write(f"\nThese files couldn't be found\n{missing}")
 
 
-def unordered_mosaic(satmaps, resolution = None):
+def unordered_mosaic(satmaps, resolution=None):
     """ Generates a mosaic from a SatMap list, independent of order.
 
     Parameters
@@ -108,14 +108,14 @@ def unordered_mosaic(satmaps, resolution = None):
     processed = []
     store_err = []
     mosaic = None
-    
+
     # Choosing the smallest resolution among the satmap list if not specified
     if resolution is None:
         resolution = inf
         for satmap in satmaps:
             if satmap.meta['resolution'] < resolution:
-                resolution = int(satmap.meta['resolution'])   
-    
+                resolution = int(satmap.meta['resolution'])
+
     # Getting mosaic from the first two available satmaps
     for satmap in satmaps:
         for other_satmap in satmaps:
@@ -173,7 +173,7 @@ def unordered_mosaic(satmaps, resolution = None):
 
 def today():
     ''' Downloads the latest image of the Aigean archive.
-    
+
     For help in using this command, type in bash:
         $ aigean_today -h
     '''
@@ -188,12 +188,12 @@ def today():
                         "PNG file.")
     arguments = parser.parse_args()
     instrument, saveplot = arguments.instrument, arguments.saveplot
-    
+
     if saveplot and instrument == 'ecne':
         sys.stderr.write("Ecne files (containing measurements but not images) "
                          "can't be visualised.")
         sys.exit(1)
-    
+
     if instrument:
         # Automatically lowercasing first letter of instrument
         if instrument[0].isupper():
@@ -204,7 +204,7 @@ def today():
             sys.stderr.write("Selected instrument must be either Lir, "
                              "Manannan, Fand or Ecne.")
             sys.exit(1)
-        
+
         # Getting the running day's data (implicit in default query_isa
         # parameters)
         sys.stdout.write('Results from the query:\n')
@@ -217,16 +217,16 @@ def today():
         query = json.loads(query_isa().text)
         newest_obs = get_latest_obs(query)
         instrument = newest_obs['instrument']
-    
+
     if saveplot and instrument == 'ecne':
         sys.stderr.write("Ecne files (containing measurements but not images) "
                          "can't be visualised.")
         sys.exit(1)
-    
+
     # Changing to current working directory and downloading the file
     chdir(CWD)
     download_isa(newest_obs['filename'])
-    
+
     # Downloading PNG if specified
     if saveplot:
         filename = get_satmap(newest_obs['filename']).visualise(save=True)
@@ -235,7 +235,7 @@ def today():
 
 def metadata():
     ''' Shows the metadata of the specified Aigean archive files.
-    
+
     For help in using this command, type in bash:
         $ aigean_metadata -h
     '''
@@ -247,13 +247,13 @@ def metadata():
                         help="Name of the file(s).")
     arguments = parser.parse_args()
     files = arguments.files
-    
+
     output_info(files, get_satmap, CWD)
 
 
 def mosaic():
     ''' Downloads a mosaic from the specified Aigean archive files.
-    
+
     For help in using this command, type in bash:
         $ aigean_mosaic -h
     '''
@@ -272,7 +272,7 @@ def mosaic():
     arguments = parser.parse_args()
     resolution = arguments.resolution
     files = arguments.file_1 + arguments.files_2
-    
+
     # Changing to current working directory and getting mosaic
     chdir(CWD)
     satmaps = list(map(get_satmap, files))

@@ -73,7 +73,7 @@ def earth_to_pixel(x, y, resolution):
     >>> earth_to_pixel(x,y,resolution)
     (2, 4)
     """
-    return x // resolution, y // resolution
+    return round(x/resolution), round(y/resolution)
 
 
 def _pixel_to_earth_tuple(x, y, resolution):

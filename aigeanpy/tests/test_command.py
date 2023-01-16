@@ -5,16 +5,39 @@ CWD = Path(os.getcwd()); TEST_DIR = Path(__file__).parent
 import yaml, json
 from pytest import mark, raises
 import subprocess
-from subprocess import check_output
+from subprocess import check_output, STDOUT, CalledProcessError
 import sys
 import numpy as np
 from aigeanpy.satmap import get_satmap
-from aigeanpy.command import unordered_mosaic, output_info
+from aigeanpy.command import unordered_mosaic, output_info, get_latest_obs
 
 
 with open(TEST_DIR/'fixtures/fixture_command.yml', 'r',
           encoding="utf-8") as yml_fixtures:
     fixtures = yaml.safe_load(yml_fixtures)
+
+
+#~~~ AIGEAN_TODAY TESTS ~~~#
+# Mocking aigeanpy.net.query_isa function requiring internet connection.
+# With Aigean observations from the 13/Jan/2023
+def query_isa(instrument = ''):
+    with open(TEST_DIR/'extra_aigean_files/query_sample.json', 'r',
+              encoding="utf-8") as json_query:
+        list_query = json.load(json_query)
+
+    if instrument == 'lir':
+        query = [obs for obs in list_query if obs['instrument'] == 'lir']
+    elif instrument == 'manannan':
+        query = [obs for obs in list_query if obs['instrument'] == 'manannan']
+    elif instrument == 'fand':
+        query = [obs for obs in list_query if obs['instrument'] == 'fand']
+    elif instrument == 'ecne':
+        query = [obs for obs in list_query if obs['instrument'] == 'ecne']
+    elif instrument == '':
+        query = list_query
+    else:
+        query = None
+    return query
 
 
 #~~~ AIGEAN_METADATA TESTS ~~~#

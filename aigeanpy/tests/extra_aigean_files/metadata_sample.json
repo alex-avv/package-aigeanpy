@@ -1,0 +1,40 @@
+{
+    "extra_aigean_files/empty/aigean_lir_20221205_194510.asdf": {
+        "archive": "ISA",
+        "instrument": "Lir",
+        "observatory": "Aigean",
+        "resolution": 30,
+        "xcoords": [800, 1400],
+        "ycoords": [100, 400],
+        "obs_date": "2022-12-05 19:45:10"
+    },
+    "extra_aigean_files/empty/aigean_man_20221210_150120.hdf5": {
+        "archive": "",
+        "instrument": "Manannan",
+        "observatory": "Aigean",
+        "resolution": 15,
+        "xcoords": [750, 1200],
+        "ycoords": [200, 350],
+        "obs_date": "2022-12-10 15:01:20"
+    },
+    "extra_aigean_files/empty/aigean_fan_20221215_095830.zip": {
+        "archive": "ISA",
+        "instrument": "Fand",
+        "observatory": "Aigean",
+        "resolution": 5,
+        "xcoords": [675, 900],
+        "ycoords": [350, 400],
+        "obs_date": "2022-12-15 09:58:30"
+    },
+    "extra_aigean_files/empty/aigean_fan_20221220_054440.zip": {
+        "archive": "ISA",
+        "instrument": "Fand",
+        "observatory": "Aigean",
+        "resolution": 5,
+        "xcoords": [1050, 1275],
+        "ycoords": [350, 400],
+        "obs_date": "2022-12-20 05:44:40"
+    },
+    "fixtures/fixture_command.yml" : "Mocking existing file, but with data in incorrect format",
+    "extra_aigean_files/empty/foo.zip" : "Mocking non-existing file"
+}

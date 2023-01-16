@@ -1,9 +1,9 @@
 from math import *
 from random import *
 import numpy as np
-import clustering
 
-def cluster(filename, clusters, iteration):
+def cluster(filename, clusters=3, iteration=10):
+
 
     """numpy type kmeans file
     Parameters
@@ -30,55 +30,18 @@ def cluster(filename, clusters, iteration):
     if type(iteration) is not int:
         raise TypeError('iteration must be an int')
 
-    # read csv
-    lines = clustering.tool4kmeans.file_reading(filename)
-
-    # change to numpy
-    samples = np.array(clustering.tool4kmeans.data_loading(lines))
-    samples_3d = np.expand_dims(samples, axis=1)
-    samples_3d_l = np.expand_dims(samples,axis=-1)
-
-    # random select center, and change to numpy
-    row_rand_array = np.arange(samples.shape[0])
-    np.random.shuffle(row_rand_array)
-    centers = samples[row_rand_array[0:clusters]]
-    centers_3d = np.expand_dims(centers, axis=0)
-
-
+    # read csv and return the points coords
+    samples = np.loadtxt(filename, delimiter = ",")
+    # random select center
+    centers = samples[np.random.choice(samples.shape[0], size = clusters, replace = False)]
 
     # iteration
-    for i in range(iteration):
-    # calculate the distance between all points and each center
-    # squre.shape is (num_points, clusters, 3), 3 means coords xyz. 
-        square = np.square(samples_3d - centers_3d)
-
-    # distance.shape is (num_points, clusters)
-        distance = np.sqrt(square.sum(axis=2))
-
-    # get the index of the centers with the min distance from the points
-        index = np.argmin(distance, axis=1)
-
-    # change the index to one-hot-encoder, facilitate subsequent calculation
-        one_hot_index = np.eye(samples.shape[0])[index][:,:clusters]
-
-
-    # group_samples[k,:,i] means it the kth point belongs to the ith center. 
-    # If the point do not belong to the center, then the coords=(0,0,0). 
-    # If it belong to the center, then the coords= the real coords of this point
-        group_samples = np.repeat(one_hot_index, 3, axis=0).reshape(samples.shape[0], 3, clusters)*samples_3d_l
-
-
-    # calculate the sum of the coordinates of all the points in each cluster
-    # sum.shape is (3, clusters)
-        sum = np.sum(group_samples, axis=0)
-
-    # update the center through calculate the average coords of each cluster
-        centers = sum/np.sum(one_hot_index, axis=0)
-        centers_3d = np.expand_dims(centers.T, axis=0)
-
-    # arr_index = np.column_stack((index,samples))
-    # print(arr_index[np.where(arr_index[:,0]==0),1:][0])
-
+    for k in range(iteration):
+        square = np.square(np.repeat(samples, clusters, axis=0).reshape(samples.shape[0], clusters, samples.shape[1]) - centers)
+        dist = np.sqrt(np.sum(square, axis=2))
+        index = np.argmin(dist, axis=1)
+        for i in range(clusters):
+            centers[i] = np.mean(samples[index == i], axis=0)
 
     return classify_points(samples,index,clusters)
 
@@ -127,3 +90,4 @@ if __name__ == "__main__":
       ax.scatter([a[0] for a in p],[a[1] for a in p],[a[2] for a in p])
     
     plt.show()
+

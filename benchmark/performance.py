@@ -67,7 +67,8 @@ plt.xlabel('N points')
 plt.ylabel('Time taken of each N')
 plt.title('Time taken comparison')
 plt.legend()
+plt.savefig('performance.png')
 plt.show()
 
 #save figure
-plt.savefig('performance.png')
+

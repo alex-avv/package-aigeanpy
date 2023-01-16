@@ -139,7 +139,12 @@ def today():
                         "PNG file.")
     arguments = parser.parse_args()
     instrument, saveplot = arguments.instrument, arguments.saveplot
-
+    
+    if saveplot and instrument == 'ecne':
+        sys.stderr.write("Ecne files (containing measurements but not images) "
+                         "can't be visualised.")
+        sys.exit(1)
+    
     if instrument:
         # Automatically lowercasing first letter of instrument
         if instrument[0].isupper():
@@ -164,16 +169,17 @@ def today():
         newest_obs = get_latest_obs(query)
         instrument = newest_obs['instrument']
     
+    if saveplot and instrument == 'ecne':
+        sys.stderr.write("Ecne files (containing measurements but not images) "
+                         "can't be visualised.")
+        sys.exit(1)
+    
     # Changing to current working directory and downloading the file
     chdir(CWD)
     download_isa(newest_obs['filename'])
     
     # Downloading PNG if specified
-    if saveplot and instrument == 'ecne':
-        sys.stderr.write("Ecne files (containing measurements but not images) "
-                         "can't be visualised.")
-        sys.exit(1)
-    elif saveplot:
+    if saveplot:
         filename = get_satmap(newest_obs['filename']).visualise(save=True)
         sys.stdout.write(f'Name of saved PNG: {filename}')
 
@@ -214,7 +220,11 @@ def mosaic():
     resolution = arguments.resolution
     files = arguments.file_1 + arguments.files_2
     
+    # Changing to current working directory and getting mosaic
+    chdir(CWD)
     satmaps = list(map(get_satmap, files))
     mosaic = unordered_mosaic(satmaps, resolution)
 
-
+    # Downloading mosaic as PNG
+    filename = mosaic.visualise(save=True)
+    sys.stdout.write(f'Name of saved PNG: {filename}')

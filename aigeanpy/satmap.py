@@ -34,7 +34,7 @@ def _earth_to_pixel_tuple(x, y, resolution):
     tuple
         Pixel coordinate, ycoords. Positive y-values going downwards.
     """
-    # change earth coords to the pixel coords by dividing resolution and move 
+    # change earth coords to the pixel coords by dividing resolution and move
     # the coords to the origin
     pixel_xcoords = (earth_to_pixel(x[0], y[0], resolution)[0],
                      earth_to_pixel(x[1], y[1], resolution)[0])
@@ -100,7 +100,7 @@ def _pixel_to_earth_tuple(x, y, resolution):
     xcoords = (pixel_to_earth(x[0], y[0], resolution)[0],
                pixel_to_earth(x[1], y[1], resolution)[0])
     # Filp the Y-axis to achieve: In the top-left corner and positive y-values
-    # going downwards. 
+    # going downwards.
     ycoords = (pixel_to_earth(x[0], y[0], resolution)[1],
                pixel_to_earth(x[1], y[1], resolution)[1])
     return xcoords, ycoords
@@ -136,6 +136,7 @@ def pixel_to_earth(x, y, resolution):
     """
     return x * resolution, y * resolution
 
+
 class SatMapFactory():
     def get_satmap_obj(self, filename):
         """ Create a SatMap object through data file for SatMap factory.
@@ -162,7 +163,9 @@ class SatMapFactory():
         >>> filename = 'aigean_fan_20230112_074702.zip'
         >>> fand = satMapFactory.get_satmap_obj(filename)
         >>> fand.meta
-        {'archive': 'ISA', 'instrument': 'Fand', 'observatory': 'Aigean', 'resolution': 5, 'xcoords': (600, 825), 'ycoords': (150, 200), 'obs_date': '2023-01-12 07:47:02'}
+        {'archive': 'ISA', 'instrument': 'Fand', 'observatory': 'Aigean', \
+'resolution': 5, 'xcoords': (600, 825), 'ycoords': (150, 200), \
+'obs_date': '2023-01-12 07:47:02'}
         """
         meta = {}
         data = []
@@ -191,6 +194,7 @@ class SatMapFactory():
 
         return satmap
 
+
 def get_satmap(filename):
     """ Create a SatMap object through SatMap Factory.
 
@@ -209,11 +213,12 @@ def get_satmap(filename):
     >>> from aigeanpy.satmap import get_satmap
     >>> filename = 'aigean_fan_20230112_074702.zip'
     >>> get_satmap(filename).meta
-    {'archive': 'ISA', 'instrument': 'Fand', 'observatory': 'Aigean', 'resolution': 5, 'xcoords': (600, 825), 'ycoords': (150, 200), 'obs_date': '2023-01-12 07:47:02'}
+    {'archive': 'ISA', 'instrument': 'Fand', 'observatory': 'Aigean', \
+'resolution': 5, 'xcoords': (600, 825), 'ycoords': (150, 200), \
+'obs_date': '2023-01-12 07:47:02'}
     """
     # create a SatMap object calling SatMap Factory
     satMapFactory = SatMapFactory()
-
     satmap = satMapFactory.get_satmap_obj(filename)
 
     return satmap
@@ -234,7 +239,7 @@ def get_hdf5(file_path):
         'observatory', 'resolution', 'xcoords', 'ycoords', 'obs_time')
     array
         Data array.
-    """    
+    """
     with h5py.File(file_path, 'r') as f:
         for key in f.keys():
             data = np.array(f[key]['data'])
@@ -257,7 +262,7 @@ def get_asdf(file_path):
         'observatory', 'resolution', 'xcoords', 'ycoords', 'obs_time')
     array
         Data array.
-    """     
+    """
     with asdf.open(file_path, 'r') as f:
         meta = meta_generate(f)
         data = np.array(f['data'])
@@ -279,7 +284,7 @@ def get_zip(file_path):
         'observatory', 'resolution', 'xcoords', 'ycoords', 'obs_time')
     array
         Data array.
-    """    
+    """
     with zipfile.ZipFile(file_path, 'r') as f:
         file_json = json.load(BytesIO(f.read(f.namelist()[2])))
         meta = meta_generate(file_json)
@@ -300,22 +305,22 @@ def meta_generate(meta_origin):
     dict
         A dict including info of data. keys including ('archive', 'instrument',
         'observatory','resolution','xcoords','ycoords','obs_time')
-    """    
+    """
     meta = {}
     # meta contain following keys
     meta_list = ['archive', 'instrument', 'observatory', 'resolution',
-                 'xcoords','ycoords']
+                 'xcoords', 'ycoords']
     for key in meta_list:
         # update the information to the meta
         try:
-            meta.update({key:meta_origin[key]})
+            meta.update({key: meta_origin[key]})
         # update with an empty value if the file do not contain the key
-        except:
-            meta.update({key:''})
+        except:  # noqa
+            meta.update({key: ''})
 
     # change coords into tuple, the type of each element is int
-    meta['xcoords'] = tuple(map(int,meta['xcoords']))
-    meta['ycoords'] = tuple(map(int,meta['ycoords']))
+    meta['xcoords'] = tuple(map(int, meta['xcoords']))
+    meta['ycoords'] = tuple(map(int, meta['ycoords']))
     # combine the date and time
     date = f"{meta_origin['date']} {meta_origin['time']}"
     meta.update({'obs_date': date})
@@ -324,7 +329,9 @@ def meta_generate(meta_origin):
 
 
 class SatMap:
-    """ SatMap class contains meta-data and figure data for three imagers, Lir, Manannan and Fand.
+    """
+    SatMap class contains meta-data and figure data for three imagers, Lir,
+    Manannan and Fand.
 
     Attributes
     ----------
@@ -348,6 +355,7 @@ class SatMap:
     visualise(self, save=False, save_path='')
         Visualise this Satmap object with correponding figure data attribute.
     """
+
     def __init__(self, meta, data):
         """ Initiate the SatMap class.
 
@@ -379,7 +387,6 @@ class SatMap:
         self.centre = (int((meta['xcoords'][1] + meta['xcoords'][0]) / 2),
                        int((meta['ycoords'][1] + meta['ycoords'][0]) / 2))
         self.extra = False
-
 
     def __add__(self, another_satmap):
         """ Do the object adding.
@@ -420,7 +427,7 @@ class SatMap:
                    max(self.meta['ycoords'][1],
                        another_satmap.meta['ycoords'][1]))
         # earth distance from new object bottom left to the origin(0,0)
-        offset = (data_ex[0],data_ey[0])
+        offset = (data_ex[0], data_ey[0])
         # get resolution from object
         resolution = self.meta['resolution']
 
@@ -468,7 +475,6 @@ class SatMap:
         new_satmap.extra = True
         return new_satmap
 
-
     def __sub__(self, another_satmap):
         """ Do the object subtract.
 
@@ -513,7 +519,7 @@ class SatMap:
         if not (data_ex[1] > data_ex[0] and data_ey[1] > data_ey[0]):
             raise ValueError('Two data must overlap')
         # earth distance from new object bottom left to the origin(0,0)
-        offset = (data_ex[0],data_ey[0])
+        offset = (data_ex[0], data_ey[0])
 
         # get resolution from object
         resolution = self.meta['resolution']
@@ -529,7 +535,6 @@ class SatMap:
                              another_satmap.meta['xcoords'][1] - offset[0])
         another_ey_offset = (another_satmap.meta['ycoords'][0] - offset[1],
                              another_satmap.meta['ycoords'][1] - offset[1])
-
 
         # change earth coords to pixel coords
         data_px, data_py = _earth_to_pixel_tuple(data_ex_offset,
@@ -554,7 +559,7 @@ class SatMap:
         # subtract 2 data
         data = data - another_satmap.data[another_offset[0]:data_py[1] +
                                           another_offset[0],
-                                          another_offset[1]:data_px[1] + 
+                                          another_offset[1]:data_px[1] +
                                           another_offset[1]]
 
         # copy the data info from the addend, but update the new coords
@@ -574,7 +579,6 @@ class SatMap:
         new_satmap.extra = True
 
         return new_satmap
-
 
     def mosaic(self, another_satmap, resolution=None, padding=True):
         """ Do the more complex object adding.
@@ -620,7 +624,7 @@ class SatMap:
                        another_satmap.meta['ycoords'][0]),
                    min(self.meta['ycoords'][1],
                        another_satmap.meta['ycoords'][1]))
-        if not (data_ex[1]>data_ex[0] and data_ey[1]>data_ey[0]):
+        if not (data_ex[1] > data_ex[0] and data_ey[1] > data_ey[0]):
             raise ValueError('Two data must overlap')
 
         # if the resolution is not specified, choose the smaller resolution
@@ -652,7 +656,7 @@ class SatMap:
             data_another = another_satmap.data
         else:
             data_another = transform.downscale_local_mean(
-                another_satmap.data, resolution // 
+                another_satmap.data, resolution //
                 another_satmap.meta['resolution'])
 
         # copy the data info from the addend, but update the new resolution
@@ -779,7 +783,6 @@ class SatMap:
         setmap.extra = True
         return setmap
 
-
     def visualise(self, save=False, save_path=''):
         """ Visualise the data.
 
@@ -818,11 +821,14 @@ class SatMap:
         else:
             plt.show()
 
+
 class Lir(SatMap):
     pass
 
+
 class Manannan(SatMap):
     pass
+
 
 class Fand(SatMap):
     pass

@@ -46,7 +46,7 @@ def test_mock_query_isa_has_no_internet_connect():
 
     with patch.object(requests, 'get') as mock_get:
         response = query_isa(start_date, stop_date, instrument)
-        mock_get.assert_called_with(http)
+        mock_get.assert_called_with(http, timeout=10)
 
 
 def test_download_isa_raise_TypeError_when_input_filename_is_not_str():
@@ -72,4 +72,4 @@ def test_mock_download_isa_has_no_internet_connect():
 
     with patch.object(requests, 'get') as mock_get:
         response = query_isa(start_date, stop_date, instrument)
-        mock_get.assert_called_with(http)
+        mock_get.assert_called_with(http, timeout=10)

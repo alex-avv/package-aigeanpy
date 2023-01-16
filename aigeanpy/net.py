@@ -75,7 +75,7 @@ def query_isa(start_date=Current_time, stop_date=Current_time, instrument=''):
             '?start_date='+start_date+stop_date+instrument)
 
     try:
-        response = requests.get(http)
+        response = requests.get(http, timeout=10)  # 10 seconds timeout
         print(response.text)
     except Exception:
         raise ConnectionError('There is no internet connection')
@@ -111,7 +111,7 @@ def download_isa(filename, save_dir=''):
     http = ('http://dokku-app.dokku.arc.ucl.ac.uk/isa-archive/download/'
             '?filename='+filename)
     try:
-        response = requests.get(http)
+        response = requests.get(http, timeout=10)  # 10 seconds timeout
     except:  # noqa
         raise ConnectionError('There is no internet connection')
 

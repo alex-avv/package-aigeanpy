@@ -1,14 +1,33 @@
+# Disabling invalid-name, missing-module-docstring, too-many-branches,
+# redefined-outer-name, bare-except and broad-except
+# pylint: disable = C0103, C0114, R0912, W0621, W0702, W0703
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-from numpy import argmax, inf
 from datetime import datetime
 import json
 import sys
-from pathlib import Path; from os import getcwd, chdir; CWD = Path(getcwd())
+from pathlib import Path
+from os import getcwd, chdir
+from numpy import argmax, inf
 from aigeanpy.net import query_isa, download_isa
 from aigeanpy.satmap import get_satmap
+CWD = Path(getcwd())
 
 
 def get_latest_obs(query):
+    """ Returns the latest observation from a query.
+
+    Parameters
+    ----------
+    query : list of dicts
+        Query, as output by the Aigean webservice.
+
+    Returns
+    -------
+    latest_obs : dict
+        Resultant newest observation.
+
+    """
+
     # Finding the index of the newest observation
     latest_i = argmax([datetime.strptime(obs['date'] + ' ' + obs['time'],
                                          '%Y-%m-%d %H:%M:%S')
@@ -18,6 +37,18 @@ def get_latest_obs(query):
 
 
 def output_info(files, get_satmap, DIR):
+    """ Outputs metadata information from the specified files.
+
+    Parameters
+    ----------
+    files : list of strs
+        List of filenames from which to extract metadata.
+    get_satmap : function
+        Function to get aigeanpy.satmap.SatMap objects.
+    DIR : Path
+        Path object denoting system directory.
+    """
+
     failed = ''
     missing = ''
     
@@ -25,7 +56,7 @@ def output_info(files, get_satmap, DIR):
         # Try processing the file, if not store the missing/failed file name
         try:
             meta = get_satmap(file).meta
-        except:
+        except:  # noqa
             # Checking whether file exits
             file_path = DIR/file
             if not file_path.is_file():
@@ -59,6 +90,21 @@ def output_info(files, get_satmap, DIR):
 
 
 def unordered_mosaic(satmaps, resolution = None):
+    """ Generates a mosaic from a SatMap list, independent of order.
+
+    Parameters
+    ----------
+    satmaps : list of SatMaps
+        List of aigeanpy.satmap.SatMap objects to build the mosaic.
+    resolution : int, optional
+        Mosaic resolution, by default None.
+
+    Returns
+    -------
+    mosaic : SatMap
+        aigeanpy.satmap.SatMap object with the mosaic.
+    """
+
     processed = []
     store_err = []
     mosaic = None
@@ -89,7 +135,8 @@ def unordered_mosaic(satmaps, resolution = None):
 
     # Getting mosaic from the rest of satmaps
     if mosaic:
-        for n in range(len(satmaps) - 2):  # (n - 2) satmaps to be processed
+        # (n - 2) satmaps to be processed |
+        for n in range(len(satmaps) - 2):  # pylint: disable = W0612
             for satmap in satmaps:
                 if satmap not in processed:
                     try:
@@ -125,8 +172,10 @@ def unordered_mosaic(satmaps, resolution = None):
 
 
 def today():
-    '''
-    Docstring
+    ''' Downloads the latest image of the Aigean archive.
+    
+    For help in using this command, type in bash:
+        $ aigean_today -h
     '''
 
     parser = ArgumentParser(description="Downloads the latest observation of "
@@ -185,8 +234,10 @@ def today():
 
 
 def metadata():
-    '''
-    Docstring
+    ''' Shows the metadata of the specified Aigean archive files.
+    
+    For help in using this command, type in bash:
+        $ aigean_metadata -h
     '''
 
     parser = ArgumentParser(description="Shows the metadata information of "
@@ -201,8 +252,10 @@ def metadata():
 
 
 def mosaic():
-    '''
-    Docstring
+    ''' Downloads a mosaic from the specified Aigean archive files.
+    
+    For help in using this command, type in bash:
+        $ aigean_mosaic -h
     '''
 
     parser = ArgumentParser(description="Generates a mosaic from the "

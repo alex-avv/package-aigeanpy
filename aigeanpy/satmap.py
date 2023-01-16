@@ -637,27 +637,9 @@ class SatMap:
             if resolution <= 0:
                 raise ValueError('Resolution must larger than 0')
 
-        # rescale the data, but use different function for up-sampling and
-        # down-sampling
-        if resolution < self.meta['resolution']:
-            data_self = transform.rescale(self.data, self.meta['resolution'] /
-                                          resolution)
-        elif resolution == self.meta['resolution']:
-            data_self = self.data
-        else:
-            data_self = transform.downscale_local_mean(self.data, resolution //
-                                                       self.meta['resolution'])
-
-        if resolution < another_satmap.meta['resolution']:
-            data_another = transform.rescale(another_satmap.data,
-                                             another_satmap.meta['resolution']
-                                             / resolution)
-        elif resolution == another_satmap.meta['resolution']:
-            data_another = another_satmap.data
-        else:
-            data_another = transform.downscale_local_mean(
-                another_satmap.data, resolution //
-                another_satmap.meta['resolution'])
+        # rescale the data, up-sampling or down-sampling
+        data_self = transform.rescale(self.data, self.meta['resolution']/resolution)
+        data_another = transform.rescale(another_satmap.data, another_satmap.meta['resolution']/resolution)
 
         # copy the data info from the addend, but update the new resolution
         meta_self = self.meta.copy()

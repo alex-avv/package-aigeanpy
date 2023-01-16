@@ -40,6 +40,28 @@ def query_isa(instrument = ''):
     return query
 
 
+@mark.parametrize('test_name', fixtures['today_arguments']) 
+def test_today_arguments(test_name):
+    properties = list(test_name.values())[0]
+    parameters = properties['parameters']
+    expected_err_message = properties['expected_err_message']
+    try:
+        check_output(parameters, stderr=STDOUT)
+    except CalledProcessError as exception:
+        assert exception.output.decode("utf-8") == expected_err_message
+        pass
+
+
+@mark.parametrize('test_name', fixtures['get_latest_obs'])
+def test_get_latest_obs(test_name):
+    properties = list(test_name.values())[0]
+    parameters = properties['parameters']
+    expected_filename = properties['expected_value']
+    
+    latest_obs = get_latest_obs(query_isa(parameters))
+    assert latest_obs['filename'] == expected_filename
+
+
 #~~~ AIGEAN_METADATA TESTS ~~~#
 # Mocking aigeanpy.satmap.get_satmap function which requires to open files. 
 # Returns 'SatMap' object with only-defined meta member variable.

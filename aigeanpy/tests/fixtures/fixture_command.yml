@@ -1,3 +1,28 @@
+today_arguments:
+  - unvalid_instrument:
+      parameters: ['aigean_today','-i','laser']
+      expected_err_message: Selected instrument must be either Lir, Manannan, Fand or Ecne.
+  - saveplot_with_ecne:
+      parameters: ['aigean_today','-i','ecne','-s']
+      expected_err_message: Ecne files (containing measurements but not images) can't be visualised.
+
+get_latest_obs:
+  - no_instrument_specified:
+      parameters: ''
+      expected_value: aigean_fan_20230113_070916.zip
+  - lir_case:
+      parameters: lir
+      expected_value: aigean_lir_20230113_065216.asdf
+  - manannan_case: 
+      parameters: manannan
+      expected_value: aigean_man_20230113_070416.hdf5
+  - fand_case:
+      parameters: fand
+      expected_value: aigean_fan_20230113_070916.zip
+  - ecne_case:
+      parameters: ecne
+      expected_value: aigean_ecn_20230113_062216.csv
+
 output_info:
   - multiple_case:
       parameters:

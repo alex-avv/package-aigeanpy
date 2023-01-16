@@ -1,8 +1,20 @@
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-from numpy import inf
+from numpy import argmax, inf
+from datetime import datetime
+import json
 import sys
-from pathlib import Path; from os import getcwd; CWD = Path(getcwd())
+from pathlib import Path; from os import getcwd, chdir; CWD = Path(getcwd())
+from aigeanpy.net import query_isa, download_isa
 from aigeanpy.satmap import get_satmap
+
+
+def get_latest_obs(query):
+    # Finding the index of the newest observation
+    latest_i = argmax([datetime.strptime(obs['date'] + ' ' + obs['time'],
+                                         '%Y-%m-%d %H:%M:%S')
+                       for obs in query])
+    latest_obs = query[latest_i]
+    return latest_obs
 
 
 def output_info(files, get_satmap, DIR):
@@ -112,13 +124,58 @@ def unordered_mosaic(satmaps, resolution = None):
         return mosaic
 
 
-def today(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
+def today():
     '''
     Docstring
     '''
 
-    ...
-    raise NotImplementedError
+    parser = ArgumentParser(description="Downloads the latest observation of "
+                            "the archive.",
+                            formatter_class=ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--instrument', '-i', metavar='<instrument>',
+                        default=None, type=str, help="Name of the instrument.")
+    parser.add_argument('--saveplot', '-s', default=False, action='store_true',
+                        help="Specifies whether to save the observation as a "
+                        "PNG file.")
+    arguments = parser.parse_args()
+    instrument, saveplot = arguments.instrument, arguments.saveplot
+
+    if instrument:
+        # Automatically lowercasing first letter of instrument
+        if instrument[0].isupper():
+            instrument = instrument[0].lower() + instrument[1:]
+
+        # Checking the validity of the input
+        if instrument not in ['lir', 'manannan', 'fand', 'ecne']:
+            sys.stderr.write("Selected instrument must be either Lir, "
+                             "Manannan, Fand or Ecne.")
+            sys.exit(1)
+        
+        # Getting the running day's data (implicit in default query_isa
+        # parameters)
+        sys.stdout.write('Results from the query:\n')
+        query = json.loads(query_isa(instrument=instrument).text)
+        # Obtaining the most recent observation
+        newest_obs = get_latest_obs(query)
+
+    else:
+        sys.stdout.write('Results from the query:\n')
+        query = json.loads(query_isa().text)
+        newest_obs = get_latest_obs(query)
+        instrument = newest_obs['instrument']
+    
+    # Changing to current working directory and downloading the file
+    chdir(CWD)
+    download_isa(newest_obs['filename'])
+    
+    # Downloading PNG if specified
+    if saveplot and instrument == 'ecne':
+        sys.stderr.write("Ecne files (containing measurements but not images) "
+                         "can't be visualised.")
+        sys.exit(1)
+    elif saveplot:
+        filename = get_satmap(newest_obs['filename']).visualise(save=True)
+        sys.stdout.write(f'Name of saved PNG: {filename}')
 
 
 def metadata():
@@ -159,6 +216,5 @@ def mosaic():
     
     satmaps = list(map(get_satmap, files))
     mosaic = unordered_mosaic(satmaps, resolution)
-    
-    
-    
+
+

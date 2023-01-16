@@ -792,6 +792,11 @@ class SatMap:
             Choose plot the figure or show the figure, by default False.
         save_path : str, optional
             The path figure saved, by default ''.
+            
+        Returns
+        -------
+        filename: str
+            The name of the saved file.
 
         Raises
         ------
@@ -818,6 +823,7 @@ class SatMap:
             self.meta['instrument']) + '_' + date + '_' + time + extra + '.png'
         if save:
             plt.savefig(os.path.join(save_path, filename))
+            return filename
         else:
             plt.show()
 

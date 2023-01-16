@@ -34,15 +34,21 @@ def _earth_to_pixel_tuple(x, y, resolution):
     tuple
         Pixel coordinate, ycoords. Positive y-values going downwards.
     """
-    # change earth coords to the pixel coords by dividing resolution and move
-    # the coords to the origin
-    pixel_xcoords = (earth_to_pixel(x[0], y[0], resolution)[0],
-                     earth_to_pixel(x[1], y[1], resolution)[0])
-    # Filp the Y-axis to achieve: In the top-left corner and positive y-values
-    # going downwards.
-    pixel_ycoords = (earth_to_pixel(x[0], y[0], resolution)[1],
-                     earth_to_pixel(x[1], y[1], resolution)[1])
-    return pixel_xcoords, pixel_ycoords
+    # change earth coords to the pixel coords by dividing resolution and move the coords to the origin
+    pixel_xcoords = [earth_to_pixel(x[0], y[0], resolution)[0], earth_to_pixel(x[1], y[1], resolution)[0]]
+    # Filp the Y-axis to achieve: In the top-left corner and positive y-values going downwards. 
+    pixel_ycoords = [earth_to_pixel(x[0], y[0], resolution)[1], earth_to_pixel(x[1], y[1], resolution)[1]]
+    if (pixel_xcoords[1]-pixel_xcoords[0]) != round((x[1]-x[0])/resolution):
+        if pixel_xcoords[0] == 0:
+            pixel_xcoords[1] = pixel_xcoords[0] + round((x[1]-x[0])/resolution)
+        else:
+            pixel_xcoords[0] = pixel_xcoords[1] - round((x[1]-x[0])/resolution)
+    if (pixel_ycoords[1]-pixel_ycoords[0]) != round((y[1]-y[0])/resolution):
+        if pixel_ycoords[0] == 0:
+            pixel_ycoords[1] = pixel_ycoords[0] + round((y[1]-y[0])/resolution)
+        else:
+            pixel_ycoords[0] = pixel_ycoords[1] - round((y[1]-y[0])/resolution)
+    return tuple(pixel_xcoords), tuple(pixel_ycoords)
 
 
 def earth_to_pixel(x, y, resolution):

@@ -1,4 +1,4 @@
-def cluster(Parameters: Parameters_Data_Type) -> Returns_Data_Type:
+def cluster(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
     '''
     Docstring
     '''

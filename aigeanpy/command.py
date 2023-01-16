@@ -1,4 +1,4 @@
-def today(Parameters: Parameters_Data_Type) -> Returns_Data_Type:
+def today(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
     '''
     Docstring
     '''
@@ -7,7 +7,7 @@ def today(Parameters: Parameters_Data_Type) -> Returns_Data_Type:
     raise NotImplementedError
 
 
-def metadata(Parameters: Parameters_Data_Type) -> Returns_Data_Type:
+def metadata(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
     '''
     Docstring
     '''
@@ -16,7 +16,7 @@ def metadata(Parameters: Parameters_Data_Type) -> Returns_Data_Type:
     raise NotImplementedError
 
 
-def mosaic(Parameters: Parameters_Data_Type) -> Returns_Data_Type:
+def mosaic(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
     '''
     Docstring
     '''

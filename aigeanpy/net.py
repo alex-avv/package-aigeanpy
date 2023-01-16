@@ -7,21 +7,21 @@ Current_time = Now.strftime("%Y-%m-%d")
 
 
 def query_isa(start_date=Current_time, stop_date=Current_time, instrument=''):
-    """query isa with start date, stop date and instrument
+    """ Query isa with start date, stop date and instrument.
 
     Parameters
     ----------
     start_date : str, optional
-        the start date of the data query, by default Current_time
+        The start date of the data query, by default Current_time.
     stop_date : str, optional
-        the stop date of the data query, by default Current_time
+        The stop date of the data query, by default Current_time.
     instrument : str, optional
-        instrument for query data, by default ''
+        Instrument for query data, by default ''.
 
     Returns
     -------
     Response
-        Response message from the url
+        Response message from the url.
 
     Raises
     ------
@@ -83,15 +83,16 @@ def query_isa(start_date=Current_time, stop_date=Current_time, instrument=''):
 
 
 def download_isa(filename, save_dir=''):
-    """download the file
+    """ Download the file.
 
     Parameters
     ----------
     filename : str
-        filename you want to download from internet, you can see through the
-        output of query_isa
+        Filename you want to download from internet, you can see through the
+        output of query_isa.
     save_dir : str, optional
-        the file saving path, by default ''
+        The file saving path, by default ''.
+
     Raises
     ------
     TypeError

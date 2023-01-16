@@ -41,7 +41,7 @@ def query_isa(start_date=Current_time, stop_date=Current_time, instrument=''):
         Stop time should be after the start time
     ConnectionError
         There is no internet connection
-    """    
+    """
     if not isinstance(start_date, str):
         raise TypeError('Start data must in str type')
     if not isinstance(stop_date, str):
@@ -51,15 +51,16 @@ def query_isa(start_date=Current_time, stop_date=Current_time, instrument=''):
     # connection error
     try:
         time_start = datetime.datetime.strptime(start_date, '%Y-%m-%d')
-    except:
+    except:  # noqa
         raise ValueError('Start time should be in YYYY-MM-DD format')
     try:
         time_stop = datetime.datetime.strptime(stop_date, '%Y-%m-%d')
-    except:
+    except:  # noqa
         raise ValueError('Stop time should be in YYYY-MM-DD format')
 
     if (time_stop-time_start).days > 3:
-        raise ValueError('Range requested too long - this service is limited to 3 days')
+        raise ValueError('Range requested too long - this service is limited '
+                         'to 3 days')
     if (time_stop-time_start).days < 0:
         raise ValueError('Stop time should be after the start time')
 
@@ -70,7 +71,8 @@ def query_isa(start_date=Current_time, stop_date=Current_time, instrument=''):
 
     if instrument != '':
         instrument = '&instrument='+instrument
-    http = 'http://dokku-app.dokku.arc.ucl.ac.uk/isa-archive/query/?start_date='+start_date+stop_date+instrument
+    http = ('http://dokku-app.dokku.arc.ucl.ac.uk/isa-archive/query/'
+            '?start_date='+start_date+stop_date+instrument)
 
     try:
         response = requests.get(http)
@@ -81,12 +83,13 @@ def query_isa(start_date=Current_time, stop_date=Current_time, instrument=''):
 
 
 def download_isa(filename, save_dir=''):
-    """download the file 
+    """download the file
 
     Parameters
     ----------
     filename : str
-        filename you want to download from internet, you can see through the output of query_isa
+        filename you want to download from internet, you can see through the
+        output of query_isa
     save_dir : str, optional
         the file saving path, by default ''
     Raises
@@ -104,10 +107,11 @@ def download_isa(filename, save_dir=''):
         raise TypeError('Filename must in str type')
     if not isinstance(save_dir, str):
         raise TypeError('Save_dir must in str type')
-    http = 'http://dokku-app.dokku.arc.ucl.ac.uk/isa-archive/download/?filename='+filename
+    http = ('http://dokku-app.dokku.arc.ucl.ac.uk/isa-archive/download/'
+            '?filename='+filename)
     try:
         response = requests.get(http)
-    except:
+    except:  # noqa
         raise ConnectionError('There is no internet connection')
 
     if response.status_code != 200:

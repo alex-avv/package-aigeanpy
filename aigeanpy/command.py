@@ -1,16 +1,20 @@
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from numpy import inf
 import sys
+from aigeanpy.satmap import get_satmap
+
 
 def unordered_mosaic(satmaps, resolution = None):
     processed = []
+    store_err = []
     mosaic = None
     
     # Choosing the smallest resolution among the satmap list if not specified
-    if not resolution:
+    if resolution is None:
         resolution = inf
         for satmap in satmaps:
             if satmap.meta['resolution'] < resolution:
-                resolution = satmap.meta['resolution']    
+                resolution = int(satmap.meta['resolution'])   
     
     # Getting mosaic from the first two available satmaps
     for satmap in satmaps:
@@ -22,7 +26,7 @@ def unordered_mosaic(satmaps, resolution = None):
                     # Breaking the inner for loop
                     break
                 except Exception as err:
-                    store_err = err
+                    store_err += [f'{type(err).__name__}: {str(err)}']
         else:
             # Continuing if inner loop wasn't broken.
             continue
@@ -40,14 +44,27 @@ def unordered_mosaic(satmaps, resolution = None):
                         # Breaking the inner for loop
                         break
                     except Exception as err:
-                        store_err = err
+                        store_err += [f'{type(err).__name__}: {str(err)}']
+    # Only keeping unique error messages
+    store_err = list(set(store_err))
 
     # If at least one of the input files fails, show relevant message. Else
     # return the mosaic.
     if len(processed) != len(satmaps):
+        # If only error is 'ValueError: Two data must overlap', then print on
+        # screen
+        overlap_err = "ValueError: Two data must overlap"
+        if len(store_err) == 1 and store_err[0] == overlap_err:
+            err_info = overlap_err + '\n'
+        # Else print only non-overlap-related errors
+        else:
+            err_info = ''
+            for err in store_err:
+                # Only keeping non-overlap-related errors
+                err_info += f'{err}\n' if err != overlap_err else ''
         sys.stderr.write("It was not possible to build a mosaic from the "
-                         "specified files and resolution. The exception was:"
-                         f"\n\n{type(store_err).__name__}: {str(store_err)}")
+                         "specified files and resolution. The exceptions "
+                         f"were:\n{err_info}")
         sys.exit(1)
     else:
         return mosaic
@@ -71,12 +88,28 @@ def metadata(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
     raise NotImplementedError
 
 
-def mosaic(_parameters: 'Parameters_Data_Type') -> 'Returns_Data_Type':
+def mosaic():
     '''
     Docstring
     '''
 
-    ...
-    raise NotImplementedError
-
-# Small change in command module
+    parser = ArgumentParser(description="Generates a mosaic from the "
+                            "specified imager files.",
+                            formatter_class=ArgumentDefaultsHelpFormatter)
+    parser.add_argument('file_1', nargs=1, metavar='<filename>',
+                        help="Name of an imager file.")
+    parser.add_argument('files_2', nargs='+', metavar='<filename>',
+                        help="Name of an (or many) imager file(s).")
+    parser.add_argument('--resolution', '-r', metavar='<resolution>',
+                        default=None, type=int, help="Resolution of the "
+                        "mosaic. If set, make sure it is compatible with "
+                        "the given files.")
+    arguments = parser.parse_args()
+    resolution = arguments.resolution
+    files = arguments.file_1 + arguments.files_2
+    
+    satmaps = list(map(get_satmap, files))
+    mosaic = unordered_mosaic(satmaps, resolution)
+    
+    
+    

@@ -4,7 +4,6 @@ import argparse
 from math import sqrt
 from random import randrange
 from pathlib import Path
-import os
 DIR = Path(__file__).parent
 
 

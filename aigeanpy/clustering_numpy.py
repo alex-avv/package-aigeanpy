@@ -2,7 +2,6 @@
 import argparse
 import numpy as np
 from pathlib import Path
-import os
 DIR = Path(__file__).parent
 
 

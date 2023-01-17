@@ -2,8 +2,13 @@ import argparse
 from math import sqrt
 from random import randrange
 from pathlib import Path
+import os
+CWD = Path(os.getcwd())
+
 
 class Tool4Kmeans:
+    """ Helper class to carry out the kmeans clustering.
+    """
     def __init__(self):
         pass
     
@@ -51,6 +56,37 @@ class Tool4Kmeans:
 
 
 def cluster(filename, clusters, iterations):
+    """ Standard python type kmeans file.
+
+    Parameters
+    ----------
+    filename :  str
+        The csv filename or csv file path.
+    clusters : int
+        How many clusters we want to classify.
+    iteration : int
+        How many times to iterate the algorithm.
+        
+    Raises
+    ------
+    FileNotFoundError
+        File '<filename>' could not be found
+    TypeError
+        Clusters must be an int
+    TypeError
+        Iteration must be an int
+    """
+    
+    # Test to check file is in the same folder
+    file_path = Path(CWD/f'{filename}')
+    if not file_path.is_file():
+        raise FileNotFoundError(f"File '{filename}' could not be found")
+    
+    if type(clusters) is not int:
+        raise TypeError("Clusters must be an int")
+    if type(iterations) is not int:
+        raise TypeError("Iteration must be an int")
+
     tool4kmeans = Tool4Kmeans()
     lines = tool4kmeans.file_reading(filename)
 

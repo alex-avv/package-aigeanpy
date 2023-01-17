@@ -222,11 +222,20 @@ def get_hdf5(file_path):
         including info of data. keys including ('archive','instrument','observatory','resolution','xcoords','ycoords','obs_time')
     array
         data array
+
+    Examples
+    --------
+    >>> from aigeanpy.satmap import get_hdf5
+    >>> filename = 'aigean_man_20221205_194510.hdf5'
+    >>> file_path_abs = sorted(Path().rglob(filename))[0]
+    >>> get_hdf5(file_path_abs)[0]
+    {'archive': '', 'instrument': 'Manannan', 'observatory': 'Aigean', 'resolution': 15, 'xcoords': (750, 1200), 'ycoords': (250, 400), 'obs_date': '2022-12-05 19:45:10'}
+
     """    
     with h5py.File(file_path, 'r') as f:
         for key in f.keys():
             data = np.array(f[key]['data'])
-            meta = meta_generate(f[key].attrs)
+            meta = _meta_generate(f[key].attrs)
     return meta, data
 
 
@@ -244,9 +253,18 @@ def get_asdf(file_path):
         including info of data. keys including ('archive','instrument','observatory','resolution','xcoords','ycoords','obs_time')
     array
         data array
+
+    Examples
+    --------
+    >>> from aigeanpy.satmap import get_asdf
+    >>> filename = 'aigean_lir_20230104_145310.asdf'
+    >>> file_path_abs = sorted(Path().rglob(filename))[0]
+    >>> get_asdf(file_path_abs)[0]
+    {'archive': 'ISA', 'instrument': 'Lir', 'observatory': 'Aigean', 'resolution': 30, 'xcoords': (100, 700), 'ycoords': (0, 300), 'obs_date': '2023-01-04 14:53:10'}
+
     """     
     with asdf.open(file_path, 'r') as f:
-        meta = meta_generate(f)
+        meta = _meta_generate(f)
         data = np.array(f['data'])
     return meta, data
 
@@ -265,15 +283,24 @@ def get_zip(file_path):
         including info of data. keys including ('archive','instrument','observatory','resolution','xcoords','ycoords','obs_time')
     array
         data array
+
+    Examples
+    --------
+    >>> from aigeanpy.satmap import get_zip
+    >>> filename = 'aigean_fan_20230112_074702.zip'
+    >>> file_path_abs = sorted(Path().rglob(filename))[0]
+    >>> get_zip(file_path_abs)[0]
+    {'archive': 'ISA', 'instrument': 'Fand', 'observatory': 'Aigean', 'resolution': 5, 'xcoords': (600, 825), 'ycoords': (150, 200), 'obs_date': '2023-01-12 07:47:02'}
+
     """    
     with zipfile.ZipFile(file_path, 'r') as f:
         file_json = json.load(BytesIO(f.read(f.namelist()[2])))
-        meta = meta_generate(file_json)
+        meta = _meta_generate(file_json)
         data = np.load(BytesIO(f.read(f.namelist()[4])))
     return meta, data
 
 
-def meta_generate(meta_origin):
+def _meta_generate(meta_origin):
     """generate meta data
 
     Parameters
@@ -333,6 +360,8 @@ class SatMap:
         Visualise this Satmap object with correponding figure data attribute
 
     """
+
+
     def __init__(self, meta, data):
         """initial the SatMap class
 
@@ -349,6 +378,15 @@ class SatMap:
             Meta must in dict type
         TypeError
             Data must in np.ndarray type
+
+        Examples
+        --------
+        >>> from aigeanpy.satmap import SatMap, get_satmap
+        >>> filename = 'aigean_fan_20230112_074702.zip'
+        >>> fand = get_satmap(filename)
+        >>> isinstance(fand, SatMap)
+        True
+
         """
         if type(meta) is not dict:
             raise TypeError('Meta must in dict type')
@@ -384,11 +422,27 @@ class SatMap:
             Different instrument cannot be added
         ValueError
             2 data must in the same day
+
+        Examples
+        --------
+        >>> from aigeanpy.satmap import SatMap, get_satmap
+        >>> filename = 'aigean_fan_20230112_074702.zip'
+        >>> fand = get_satmap(filename)
+        >>> new_fand = fand + fand
+        >>> (fand.data == new_fand.data).all()
+        True
+        >>> lir_file = 'aigean_lir_20230104_145310.asdf'
+        >>> lir = get_satmap(lir_file)
+        >>> fand + lir
+        Traceback (most recent call last):
+        ValueError: Different instruments with different resolution cannot be added
+
         """
+
         if not isinstance(another_satmap, SatMap):
             raise TypeError('Another_satmap must in SatMap type')
         if self.meta['resolution'] != another_satmap.meta['resolution']:
-            raise ValueError('Different instrument cannot be added')
+            raise ValueError('Different instruments with different resolution cannot be added')
         if self.meta['obs_date'][:10] != another_satmap.meta['obs_date'][:10]:
             raise ValueError('2 data must in the same day')
 
@@ -460,12 +514,30 @@ class SatMap:
             2 data must in different days
         ValueError
             Two data must overlap
+
+        Examples
+        --------
+        >>> from aigeanpy.satmap import SatMap, get_satmap
+        >>> filename = 'aigean_fan_20230104_150010.zip'
+        >>> fand1 = get_satmap(filename)
+        >>> filename2 = 'aigean_fan_20230112_074702.zip'
+        >>> fand2 = get_satmap(filename2)
+        >>> actual_data = (fand1 - fand2).data
+        >>> expected_data = fand1.data[:,30:45] -fand2.data[:,:15]
+        >>> (expected_data == actual_data).all()
+        True
+        >>> lir_file = 'aigean_lir_20230104_145310.asdf'
+        >>> lir = get_satmap(lir_file)
+        >>> fand1 - lir
+        Traceback (most recent call last):
+        ValueError: Different instruments with different resolution cannot be added
+
         """
         # if type(another_satmap) is not SatMap:
         if not isinstance(another_satmap, SatMap):
             raise TypeError('Another_satmap must in SatMap type')
         if self.meta['resolution'] != another_satmap.meta['resolution']:
-            raise ValueError('Different instrument cannot be subtracted')
+            raise ValueError('Different instruments with different resolution cannot be added')
         if self.meta['obs_date'][:10] == another_satmap.meta['obs_date'][:10]:
             raise ValueError('2 data must in different days')
         # earth coords of the new object
@@ -556,6 +628,26 @@ class SatMap:
             Resolution must be int type
         ValueError
             Resolution must larger than 0
+
+        Examples
+        --------
+        >>> from aigeanpy.satmap import SatMap, get_satmap
+        >>> filename = 'aigean_fan_20230104_150010.zip'
+        >>> fand1 = get_satmap(filename)
+        >>> filename2 = 'aigean_fan_20230112_074702.zip'
+        >>> fand2 = get_satmap(filename2)
+        >>> fand2.meta['obs_date'] = '2023-01-04 14:53:10'
+        >>> actual = fand1.mosaic(fand2, padding=False)
+        >>> expected = (637, 175)
+        >>> actual.centre == expected
+        True
+        >>> lir_file = 'aigean_lir_20230104_145310.asdf'
+        >>> lir = get_satmap(lir_file)
+        >>> actual = fand1.mosaic(lir)
+        >>> expected = (400, 150)
+        >>> actual.centre == expected
+        True
+
         """
         if not isinstance(another_satmap, SatMap):
             raise TypeError('Another_satmap must in SatMap type')
@@ -694,6 +786,16 @@ class SatMap:
             Save must in bool type
         TypeError
             Save_path must be a str
+
+        Examples
+        --------
+        >>> from aigeanpy.satmap import SatMap, get_satmap
+        >>> filename = 'aigean_fan_20230104_150010.zip'
+        >>> fand = get_satmap(filename)
+        >>> fand.visualise(save_path=123)
+        Traceback (most recent call last):
+        TypeError: Save_path must be a str
+
         """
         if type(save) is not bool:
             raise TypeError('Save must in bool type')
@@ -717,10 +819,19 @@ class SatMap:
             plt.show()
 
 class Lir(SatMap):
+    """
+    Lir class extends to SatMap, which contains all the attributes and methods from SatMap.
+    """
     pass
 
 class Manannan(SatMap):
+    """
+    Manannan class extends to SatMap, which contains all the attributes and methods from SatMap.
+    """
     pass
 
 class Fand(SatMap):
+    """
+    Fand class extends to SatMap, which contains all the attributes and methods from SatMap.
+    """
     pass

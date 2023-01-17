@@ -147,7 +147,7 @@ def test_add_two_differetn_types_data_raise_TypeError():
         ecne = Ecne()
         mock_fand + ecne
 
-def test_add_two_SatMap_with_diff_resolution_rais_ValueError():
+def test_add_two_SatMap_with_diff_resolution_raise_ValueError():
     fand_file = 'aigean_fan_20230104_150010.zip'
     mock_fand = _get_fand(fand_file)
     lir_file = 'aigean_lir_20230104_145310.asdf'
@@ -156,7 +156,7 @@ def test_add_two_SatMap_with_diff_resolution_rais_ValueError():
     with pytest.raises(ValueError) as err:
         mock_fand + mock_lir
 
-def test_add_two_SatMap_from_diff_date():
+def test_add_two_SatMap_from_diff_date_should_raise_ValueError():
     fand_file = 'aigean_fan_20230104_150010.zip'
     mock_fand = _get_fand(fand_file)
     lir_file = 'aigean_lir_20230104_145310.asdf'

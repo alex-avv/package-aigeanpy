@@ -5,7 +5,7 @@ from math import sqrt
 from random import randrange
 from pathlib import Path
 import os
-CWD = Path(os.getcwd())
+DIR = Path(__file__).parent
 
 
 class Tool4Kmeans:
@@ -81,7 +81,7 @@ def cluster(filename, clusters, iterations):
     """
 
     # Test to check file is in the same folder
-    file_path = Path(CWD/f'{filename}')
+    file_path = Path(DIR/f'{filename}')
     if not file_path.is_file():
         raise FileNotFoundError(f"File '{filename}' could not be found")
 

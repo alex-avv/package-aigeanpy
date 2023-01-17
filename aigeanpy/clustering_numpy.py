@@ -1,48 +1,46 @@
+import argparse
 from math import *
 from random import *
 import numpy as np
 
 
 def cluster(filename, clusters=3, iteration=10):
+    """ Numpy type kmeans file.
 
-    """numpy type kmeans file
     Parameters
     ----------
     filename :  Union(Path, str)
-        the csv filename or csv file path
+        The csv filename or csv file path.
     clusters : int
-        how many clusters we want to classify
+        How many clusters we want to classify.
     iteration : int
-        how many times we want to repeat steps 2-3
+        How many times we want to repeat steps 2-3.
     Raises
     ------
     TypeError
-        clusters must be an int
+        Clusters must be an int
     TypeError
-        iteration must be an int
+        Iteration must be an int
     """
 
     if __name__ == "__main__":
         global centers
 
     if type(clusters) is not int:
-        raise TypeError("clusters must be an int")
+        raise TypeError("Clusters must be an int")
     if type(iteration) is not int:
-        raise TypeError("iteration must be an int")
+        raise TypeError("Iteration must be an int")
 
     # read csv and return the points coords
     samples = np.loadtxt(filename, delimiter=",")
     # random select center
-    centers = samples[np.random.choice(samples.shape[0], size=clusters, replace=False)]
+    centers = samples[np.random.choice(samples.shape[0], size=clusters,
+                                       replace=False)]
 
     # iteration
     for k in range(iteration):
-        square = np.square(
-            np.repeat(samples, clusters, axis=0).reshape(
-                samples.shape[0], clusters, samples.shape[1]
-            )
-            - centers
-        )
+        square = np.square(np.repeat(samples, clusters, axis=0).reshape(
+            samples.shape[0], clusters, samples.shape[1]) - centers)
         dist = np.sqrt(np.sum(square, axis=2))
         index = np.argmin(dist, axis=1)
         for i in range(clusters):
@@ -52,7 +50,6 @@ def cluster(filename, clusters=3, iteration=10):
 
 
 def classify_points(points, alloc, clusters):
-
     arr_index = np.column_stack((alloc, points))
 
     classify = []
@@ -64,26 +61,16 @@ def classify_points(points, alloc, clusters):
 
 
 if __name__ == "__main__":
-
-    import argparse
-
-    parse = argparse.ArgumentParser(description="set argument")
-    parse.add_argument("file_path", type=str, help=" file of data")
-    parse.add_argument("--clusters", default=3, type=int, help=" clusters of k_means")
-    parse.add_argument("--iters", default=10, type=int, help=" iteration of k_means")
-    parse.add_argument(
-        "--showclusters",
-        default=False,
-        type=bool,
-        help=" show the visual clusters or not",
-    )
-    parse.add_argument(
-        "--plotclusters",
-        default=False,
-        type=bool,
-        help=" plot the visual clusters or not",
-    )
-
+    parse = argparse.ArgumentParser(description="Set argument.")
+    parse.add_argument("file_path", type=str, help=" File of data")
+    parse.add_argument("--clusters", default=3, type=int,
+                       help="Clusters of k_means.")
+    parse.add_argument("--iters", default=10, type=int,
+                       help="Iteration of k_means.")
+    parse.add_argument("--showclusters", default=False, type=bool,
+                       help="Show the visual clusters or not.")
+    parse.add_argument("--plotclusters", default=False, type=bool,
+                       help="Plot the visual clusters or not.")
     args = parse.parse_args()
 
     Lclustring_point = cluster(args.file_path, args.clusters, args.iters)
@@ -91,16 +78,15 @@ if __name__ == "__main__":
     if args.showclusters == True:
         g = 0
         for p in Lclustring_point:
-            print(
-                "Cluster "
-                + str(g)
-                + " is centred at "
-                + str(centers[g,:])
-                + " and has "
-                + str(len(p))
-                + " points."
-            )
+            print("Cluster " + str(g) + " is centred at " + str(centers[g,:])
+                  + " and has " + str(len(p)) + " points.")
             print(p)
+            g += 1
+    else:
+        g = 0
+        for p in Lclustring_point:
+            print("Cluster " + str(g) + " is centred at " + str(centers[g,:])
+                  + " and has " + str(len(p)) + " points.")
             g += 1
 
     if args.plotclusters == True:

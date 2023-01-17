@@ -1,17 +1,30 @@
+def kmeans(filename, clusters = 3, iterations = 10, isNumpy = False):
+    """ Forms clusters from the specified points using the kmeans algorithm.
 
-from pathlib import Path
+    Parameters
+    ----------
+    filename : str
+        Path to the CSV file with the points to be grouped.
+    clusters : int, optional
+        Number of clusters, by default 3.
+    iterations : int, optional
+        Number of iterations for the algorithm, by default 10.
+    isNumpy : bool, optional
+        Specify whether to use the numpy version, by default False.
 
-def kmeans(filename, clusters: int = 3, iterations: int = 10, isNumpy = False) -> list:
-    
+    Returns
+    -------
+    list
+        With the indices of the points for each group.
+
+    """
+
     if isNumpy == False:
         import clustering
 
         return clustering.cluster(filename, clusters, iterations)
-    
+
     if isNumpy == True:
         import clustering_numpy
 
         return clustering_numpy.cluster(filename, clusters, iterations)
-
-if __name__ == '__main__':
-    print(kmeans('samples1.csv'))

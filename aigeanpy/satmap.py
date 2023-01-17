@@ -34,10 +34,16 @@ def _earth_to_pixel_tuple(x, y, resolution):
     tuple
         Pixel coordinate, ycoords. Positive y-values going downwards.
     """
-    # change earth coords to the pixel coords by dividing resolution and move the coords to the origin
-    pixel_xcoords = [earth_to_pixel(x[0], y[0], resolution)[0], earth_to_pixel(x[1], y[1], resolution)[0]]
-    # Filp the Y-axis to achieve: In the top-left corner and positive y-values going downwards. 
-    pixel_ycoords = [earth_to_pixel(x[0], y[0], resolution)[1], earth_to_pixel(x[1], y[1], resolution)[1]]
+    # change earth coords to the pixel coords by
+    # dividing resolution and move the coords to the origin
+    pixel_xcoords = [
+        earth_to_pixel(x[0], y[0], resolution)[0],
+        earth_to_pixel(x[1], y[1], resolution)[0]]
+    # Filp the Y-axis to achieve: In the top-left
+    # corner and positive y-values going downwards.
+    pixel_ycoords = [
+        earth_to_pixel(x[0], y[0], resolution)[1],
+        earth_to_pixel(x[1], y[1], resolution)[1]]
     if (pixel_xcoords[1]-pixel_xcoords[0]) != round((x[1]-x[0])/resolution):
         if pixel_xcoords[0] == 0:
             pixel_xcoords[1] = pixel_xcoords[0] + round((x[1]-x[0])/resolution)
@@ -252,7 +258,10 @@ def get_hdf5(file_path):
     >>> filename = 'aigean_man_20221205_194510.hdf5'
     >>> file_path_abs = sorted(Path().rglob(filename))[0]
     >>> get_hdf5(file_path_abs)[0]
-    {'archive': '', 'instrument': 'Manannan', 'observatory': 'Aigean', 'resolution': 15, 'xcoords': (750, 1200), 'ycoords': (250, 400), 'obs_date': '2022-12-05 19:45:10'}
+    {'archive': '', 'instrument': 'Manannan',
+    'observatory': 'Aigean', 'resolution': 15,
+    'xcoords': (750, 1200), 'ycoords': (250, 400),
+    'obs_date': '2022-12-05 19:45:10'}
 
     """
     with h5py.File(file_path, 'r') as f:
@@ -284,7 +293,10 @@ def get_asdf(file_path):
     >>> filename = 'aigean_lir_20230104_145310.asdf'
     >>> file_path_abs = sorted(Path().rglob(filename))[0]
     >>> get_asdf(file_path_abs)[0]
-    {'archive': 'ISA', 'instrument': 'Lir', 'observatory': 'Aigean', 'resolution': 30, 'xcoords': (100, 700), 'ycoords': (0, 300), 'obs_date': '2023-01-04 14:53:10'}
+    {'archive': 'ISA', 'instrument': 'Lir',
+    'observatory': 'Aigean', 'resolution': 30,
+    'xcoords': (100, 700), 'ycoords': (0, 300),
+    'obs_date': '2023-01-04 14:53:10'}
     """
     with asdf.open(file_path, 'r') as f:
         meta = _meta_generate(f)
@@ -314,14 +326,18 @@ def get_zip(file_path):
     >>> filename = 'aigean_fan_20230112_074702.zip'
     >>> file_path_abs = sorted(Path().rglob(filename))[0]
     >>> get_zip(file_path_abs)[0]
-    {'archive': 'ISA', 'instrument': 'Fand', 'observatory': 'Aigean', 'resolution': 5, 'xcoords': (600, 825), 'ycoords': (150, 200), 'obs_date': '2023-01-12 07:47:02'}
+    {'archive': 'ISA', 'instrument': 'Fand',
+    'observatory': 'Aigean', 'resolution': 5,
+    'xcoords': (600, 825), 'ycoords': (150, 200),
+    'obs_date': '2023-01-12 07:47:02'}
 
     """
 
     with zipfile.ZipFile(file_path, 'r') as f:
-        file_json = json.load(BytesIO(f.read(f.namelist()[2])))
+        print(f.namelist())
+        file_json = json.load(BytesIO(f.read(f.namelist()[0])))
         meta = _meta_generate(file_json)
-        data = np.load(BytesIO(f.read(f.namelist()[4])))
+        data = np.load(BytesIO(f.read(f.namelist()[1])))
     return meta, data
 
 
@@ -388,7 +404,6 @@ class SatMap:
     visualise(self, save=False, save_path='')
         Visualise this Satmap object with correponding figure data attribute.
     """
-
 
     def __init__(self, meta, data):
         """ Initiate the SatMap class.
@@ -465,14 +480,16 @@ class SatMap:
         >>> lir = get_satmap(lir_file)
         >>> fand + lir
         Traceback (most recent call last):
-        ValueError: Different instruments with different resolution cannot be added
+        ValueError: Different instruments with
+            different resolution cannot be added
 
         """
 
         if not isinstance(another_satmap, SatMap):
             raise TypeError('Another_satmap must in SatMap type')
         if self.meta['resolution'] != another_satmap.meta['resolution']:
-            raise ValueError('Different instruments with different resolution cannot be added')
+            raise ValueError('Different instruments with\
+            different resolution cannot be added')
         if self.meta['obs_date'][:10] != another_satmap.meta['obs_date'][:10]:
             raise ValueError('2 data must in the same day')
 
@@ -573,14 +590,16 @@ class SatMap:
         >>> lir = get_satmap(lir_file)
         >>> fand1 - lir
         Traceback (most recent call last):
-        ValueError: Different instruments with different resolution cannot be added
+        ValueError: Different instruments with
+            different resolution cannot be added
 
         """
         # if type(another_satmap) is not SatMap:
         if not isinstance(another_satmap, SatMap):
             raise TypeError('Another_satmap must in SatMap type')
         if self.meta['resolution'] != another_satmap.meta['resolution']:
-            raise ValueError('Different instruments with different resolution cannot be added')
+            raise ValueError('Different instruments\
+                with different resolution cannot be added')
         if self.meta['obs_date'][:10] == another_satmap.meta['obs_date'][:10]:
             raise ValueError('2 data must in different days')
         # earth coords of the new object
@@ -735,8 +754,10 @@ class SatMap:
                 raise ValueError('Resolution must larger than 0')
 
         # rescale the data, up-sampling or down-sampling
-        data_self = transform.rescale(self.data, self.meta['resolution']/resolution)
-        data_another = transform.rescale(another_satmap.data, another_satmap.meta['resolution']/resolution)
+        data_self = transform.rescale(
+            self.data, self.meta['resolution']/resolution)
+        data_another = transform.rescale(
+            another_satmap.data, another_satmap.meta['resolution']/resolution)
 
         # copy the data info from the addend, but update the new resolution
         meta_self = self.meta.copy()
@@ -913,17 +934,20 @@ class SatMap:
 
 class Lir(SatMap):
     """
-    Lir class extends to SatMap, which contains all the attributes and methods from SatMap.
+    Lir class extends to SatMap, which contains
+        all the attributes and methods from SatMap.
     """
 
 
 class Manannan(SatMap):
     """
-    Manannan class extends to SatMap, which contains all the attributes and methods from SatMap.
+    Manannan class extends to SatMap, which contains
+        all the attributes and methods from SatMap.
     """
 
 
 class Fand(SatMap):
     """
-    Fand class extends to SatMap, which contains all the attributes and methods from SatMap.
+    Fand class extends to SatMap, which contains
+        all the attributes and methods from SatMap.
     """

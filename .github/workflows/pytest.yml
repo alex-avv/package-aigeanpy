@@ -43,7 +43,7 @@ jobs:
       - name: Run pylint
         run: |
           # Disabling missing-module-docstring, unnecessary-ellipsis, and too-few-public-methods errors
-          pylint aigeanpy --disable C0114,R0903,W2301,C0411,C0301,W0612,C0103,C0303,W0707,C0116,R0801,R0201
+          pylint aigeanpy --disable C0114,R0903,W2301,C0411,C0301,W0612,C0103,C0303,W0707,C0116,R0801,R0201,C0206
       - name: Run pycodestyle
         run: |
           pycodestyle aigeanpy

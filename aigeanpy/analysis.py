@@ -16,7 +16,6 @@ def kmeans(filename, clusters = 3, iterations = 10, isNumpy = False):
     -------
     list
         With the indices of the points for each group.
-
     """
 
     if isNumpy == False:

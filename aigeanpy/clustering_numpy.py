@@ -2,21 +2,27 @@ import argparse
 from math import *
 from random import *
 import numpy as np
+from pathlib import Path
+import os
+CWD = Path(os.getcwd())
 
 
-def cluster(filename, clusters=3, iteration=10):
+def cluster(filename, clusters = 3, iteration = 10):
     """ Numpy type kmeans file.
 
     Parameters
     ----------
-    filename :  Union(Path, str)
+    filename :  str
         The csv filename or csv file path.
     clusters : int
         How many clusters we want to classify.
     iteration : int
         How many times we want to repeat steps 2-3.
+
     Raises
     ------
+    FileNotFoundError
+        File '<filename>' could not be found
     TypeError
         Clusters must be an int
     TypeError
@@ -25,6 +31,11 @@ def cluster(filename, clusters=3, iteration=10):
 
     if __name__ == "__main__":
         global centers
+
+    # Test to check file is in the same folder
+    file_path = Path(CWD/f'{filename}')
+    if not file_path.is_file():
+        raise FileNotFoundError(f"File '{filename}' could not be found")    
 
     if type(clusters) is not int:
         raise TypeError("Clusters must be an int")
@@ -50,6 +61,8 @@ def cluster(filename, clusters=3, iteration=10):
 
 
 def classify_points(points, alloc, clusters):
+    """ Helper function to classify the measurement points.
+    """
     arr_index = np.column_stack((alloc, points))
 
     classify = []

@@ -258,10 +258,10 @@ def get_hdf5(file_path):
     >>> filename = 'aigean_man_20221205_194510.hdf5'
     >>> file_path_abs = sorted(Path().rglob(filename))[0]
     >>> get_hdf5(file_path_abs)[0]
-    {'archive': '', 'instrument': 'Manannan',
-    'observatory': 'Aigean', 'resolution': 15,
-    'xcoords': (750, 1200), 'ycoords': (250, 400),
-    'obs_date': '2022-12-05 19:45:10'}
+    {'archive': '', 'instrument': 'Manannan', \
+'observatory': 'Aigean', 'resolution': 15, \
+'xcoords': (750, 1200), 'ycoords': (250, 400), \
+'obs_date': '2022-12-05 19:45:10'}
 
     """
     with h5py.File(file_path, 'r') as f:
@@ -293,10 +293,10 @@ def get_asdf(file_path):
     >>> filename = 'aigean_lir_20230104_145310.asdf'
     >>> file_path_abs = sorted(Path().rglob(filename))[0]
     >>> get_asdf(file_path_abs)[0]
-    {'archive': 'ISA', 'instrument': 'Lir',
-    'observatory': 'Aigean', 'resolution': 30,
-    'xcoords': (100, 700), 'ycoords': (0, 300),
-    'obs_date': '2023-01-04 14:53:10'}
+    {'archive': 'ISA', 'instrument': 'Lir', \
+'observatory': 'Aigean', 'resolution': 30, \
+'xcoords': (100, 700), 'ycoords': (0, 300), \
+'obs_date': '2023-01-04 14:53:10'}
     """
     with asdf.open(file_path, 'r') as f:
         meta = _meta_generate(f)
@@ -326,15 +326,14 @@ def get_zip(file_path):
     >>> filename = 'aigean_fan_20230112_074702.zip'
     >>> file_path_abs = sorted(Path().rglob(filename))[0]
     >>> get_zip(file_path_abs)[0]
-    {'archive': 'ISA', 'instrument': 'Fand',
-    'observatory': 'Aigean', 'resolution': 5,
-    'xcoords': (600, 825), 'ycoords': (150, 200),
-    'obs_date': '2023-01-12 07:47:02'}
+    {'archive': 'ISA', 'instrument': 'Fand', \
+'observatory': 'Aigean', 'resolution': 5, \
+'xcoords': (600, 825), 'ycoords': (150, 200), \
+'obs_date': '2023-01-12 07:47:02'}
 
     """
 
     with zipfile.ZipFile(file_path, 'r') as f:
-        print(f.namelist())
         file_json = json.load(BytesIO(f.read(f.namelist()[0])))
         meta = _meta_generate(file_json)
         data = np.load(BytesIO(f.read(f.namelist()[1])))
@@ -480,16 +479,16 @@ class SatMap:
         >>> lir = get_satmap(lir_file)
         >>> fand + lir
         Traceback (most recent call last):
-        ValueError: Different instruments with
-            different resolution cannot be added
+        ValueError: Different instruments with \
+different resolution cannot be added
 
         """
 
         if not isinstance(another_satmap, SatMap):
             raise TypeError('Another_satmap must in SatMap type')
         if self.meta['resolution'] != another_satmap.meta['resolution']:
-            raise ValueError('Different instruments with\
-            different resolution cannot be added')
+            raise ValueError('Different instruments with \
+different resolution cannot be added')
         if self.meta['obs_date'][:10] != another_satmap.meta['obs_date'][:10]:
             raise ValueError('2 data must in the same day')
 
@@ -590,16 +589,16 @@ class SatMap:
         >>> lir = get_satmap(lir_file)
         >>> fand1 - lir
         Traceback (most recent call last):
-        ValueError: Different instruments with
-            different resolution cannot be added
+        ValueError: Different instruments with \
+different resolution cannot be added
 
         """
         # if type(another_satmap) is not SatMap:
         if not isinstance(another_satmap, SatMap):
             raise TypeError('Another_satmap must in SatMap type')
         if self.meta['resolution'] != another_satmap.meta['resolution']:
-            raise ValueError('Different instruments\
-                with different resolution cannot be added')
+            raise ValueError('Different instruments \
+with different resolution cannot be added')
         if self.meta['obs_date'][:10] == another_satmap.meta['obs_date'][:10]:
             raise ValueError('2 data must in different days')
         # earth coords of the new object

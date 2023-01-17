@@ -1,3 +1,5 @@
+# pylint: disable = R1728, W0601, W0621, W1514,
+
 import argparse
 from math import sqrt
 from random import randrange
@@ -9,9 +11,10 @@ CWD = Path(os.getcwd())
 class Tool4Kmeans:
     """ Helper class to carry out the kmeans clustering.
     """
+
     def __init__(self):
         pass
-    
+
     # with safty open
     def file_reading(self, file_path):
         with open(sorted(Path().rglob(file_path))[0], "r") as file:
@@ -22,7 +25,7 @@ class Tool4Kmeans:
         process_data = []
         for line in lines:
             # merge the data into list
-            process_data.append(tuple(map(float, line.strip().split(",")))) 
+            process_data.append(tuple(map(float, line.strip().split(","))))
         return process_data
 
     def create_random_point(self, Lpoint, groups):
@@ -31,13 +34,13 @@ class Tool4Kmeans:
     def distance2points(self, point1, Lpoint2):
         Ldistance2point = []
         for point in Lpoint2:
-            Ldistance2point.append(sqrt((point1[0] - point[0]) ** 2
-                                         + (point1[1] - point[1]) ** 2
-                                         + (point1[2] - point[2]) ** 2))
+            Ldistance2point.append(sqrt(
+                (point1[0] - point[0]) ** 2 + (point1[1] - point[1]) ** 2
+                + (point1[2] - point[2]) ** 2))
         return Ldistance2point
 
-    def min_index(self, list):
-        return list.index(min(list))
+    def min_index(self, point_list):
+        return point_list.index(min(point_list))
 
     def group_datas(self, group, Lprocess_data, alloc):
         group_data = []
@@ -49,7 +52,7 @@ class Tool4Kmeans:
     def classify_points(self, points, alloc, clusters):
         classify = []
         for g in range(clusters):
-            alloc_process_data = self.group_datas(g, process_data, alloc)
+            alloc_process_data = self.group_datas(g, points, alloc)
             classify.append(alloc_process_data)
 
         return classify
@@ -66,7 +69,7 @@ def cluster(filename, clusters, iterations):
         How many clusters we want to classify.
     iteration : int
         How many times to iterate the algorithm.
-        
+
     Raises
     ------
     FileNotFoundError
@@ -76,15 +79,15 @@ def cluster(filename, clusters, iterations):
     TypeError
         Iteration must be an int
     """
-    
+
     # Test to check file is in the same folder
     file_path = Path(CWD/f'{filename}')
     if not file_path.is_file():
         raise FileNotFoundError(f"File '{filename}' could not be found")
-    
-    if type(clusters) is not int:
+
+    if not isinstance(clusters, int):
         raise TypeError("Clusters must be an int")
-    if type(iterations) is not int:
+    if not isinstance(iterations, int):
         raise TypeError("Iteration must be an int")
 
     tool4kmeans = Tool4Kmeans()
@@ -97,8 +100,8 @@ def cluster(filename, clusters, iterations):
     process_data = tool4kmeans.data_loading(lines)
 
     # random find the piont in dataset
-    central_point = tool4kmeans.create_random_point(process_data, clusters) 
-    
+    central_point = tool4kmeans.create_random_point(process_data, clusters)
+
     alloc = []
     n = 0
     while n < iterations:
@@ -108,9 +111,9 @@ def cluster(filename, clusters, iterations):
             # find the min distance index
             alloc.append(tool4kmeans.min_index(Ldistance))
         for g in range(clusters):
-            alloc_process_data = tool4kmeans.group_datas(g, 
+            alloc_process_data = tool4kmeans.group_datas(g,
                                                          process_data, alloc)
-            new_mean = (sum([a[0] for a in alloc_process_data]) / 
+            new_mean = (sum([a[0] for a in alloc_process_data]) /
                         len(alloc_process_data),
                         sum([a[1] for a in alloc_process_data]) /
                         len(alloc_process_data),
@@ -137,7 +140,7 @@ if __name__ == "__main__":
 
     Lclustring_point = cluster(args.file_path, args.clusters, args.iters)
 
-    if args.showclusters == True:
+    if args.showclusters is True:
         g = 0
         for p in Lclustring_point:
             print("Cluster " + str(g) + " is centred at "
@@ -153,7 +156,7 @@ if __name__ == "__main__":
                   + " points.")
             g += 1
 
-    if args.plotclusters == True:
+    if args.plotclusters is True:
         from matplotlib import pyplot as plt
 
         fig = plt.figure()

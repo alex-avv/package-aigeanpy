@@ -632,7 +632,7 @@ class SatMap:
             resolution = min(self.meta['resolution'],
                              another_satmap.meta['resolution'])
         else:
-            if isinstance(resolution, int):
+            if not isinstance(resolution, int):
                 raise TypeError('Resolution must be int type')
             if resolution <= 0:
                 raise ValueError('Resolution must larger than 0')
@@ -783,7 +783,7 @@ class SatMap:
         setmap.extra = True
         return setmap
 
-    def visualise(self, save=False, save_path=''):
+    def visualise(self, save=False, save_path=''):  # pylint: disable = R1710
         """ Visualise the data.
 
         Parameters
@@ -792,6 +792,11 @@ class SatMap:
             Choose plot the figure or show the figure, by default False.
         save_path : str, optional
             The path figure saved, by default ''.
+
+        Returns
+        -------
+        filename: str
+            The name of the saved file.
 
         Raises
         ------
@@ -818,8 +823,8 @@ class SatMap:
             self.meta['instrument']) + '_' + date + '_' + time + extra + '.png'
         if save:
             plt.savefig(os.path.join(save_path, filename))
-        else:
-            plt.show()
+            return filename
+        plt.show()
 
 
 class Lir(SatMap):

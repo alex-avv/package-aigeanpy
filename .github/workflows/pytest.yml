@@ -17,8 +17,6 @@ jobs:
       matrix:
         # platform: [ubuntu-latest, windows-latest, macos-latest]
         python-version: [3.9]
-    # Only runs test job on main branch
-    if: github.ref == 'refs/heads/main'
 
     steps:
       # Checkout the repository and setups the machine to use python

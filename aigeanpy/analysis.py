@@ -1,3 +1,5 @@
+from aigeanpy import clustering, clustering_numpy
+
 def kmeans(filename, clusters = 3, iterations = 10, isNumpy = False):
     """ Forms clusters from the specified points using the kmeans algorithm.
 
@@ -19,11 +21,7 @@ def kmeans(filename, clusters = 3, iterations = 10, isNumpy = False):
     """
 
     if isNumpy == False:
-        import clustering
-
         return clustering.cluster(filename, clusters, iterations)
 
     if isNumpy == True:
-        import clustering_numpy
-
         return clustering_numpy.cluster(filename, clusters, iterations)

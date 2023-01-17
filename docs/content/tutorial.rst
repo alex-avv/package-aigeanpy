@@ -16,9 +16,9 @@ An example query_isa use case would be the following:
 
 .. code-block:: Python
 
-    query_isa("2023-01-16", "2023-01-19", "Lir")
+    query_isa("2023-01-13", "2023-01-15", "Lir")
 
-This query will retrieve all Lir imagery data from the isa-archive between the dates of the 16th of January 2023 and 19th of January 2023.
+This query will retrieve all Lir imagery data from the isa-archive between the dates of the 13th of January 2023 and 15th of January 2023.
 
 How to download images for a particular date:
 *********************************************
@@ -32,7 +32,11 @@ An example download_isa use case would be the following:
 
 .. code-block:: Python
 
-    download_isa("{queriedfile}.{instrumentext}", "C:\\{foldertosaveto}\\")
+    download_isa("aigean_lir_20230104_145310.asdf", "C:/{foldertosaveto}/")
 
-Where queriedfile represents the name of the file in the database, the instrumentext represents the instrument type to be parsed (asdf, hdf5, zip),
-and the foldertosaveto represents the path to the locally saved file.
+Metadata update when combining images:
+**************************************
+When you add or substract two images, 'archive', 'instrument', 'observatory', 'resolution', and 'obs_time' in meta will only hold the value of the first satmap. Just the 'xcoords' and 'ycoords' are updated.
+
+When using the mosaic method to add two images, 'archive', 'instrument', 'observatory', and 'obs_time' will only hold the value in the first satmap. Just the 'Resolution', 'xcoords' and 'ycoords' are updated. 
+If creating the mosaic with padding = False, it will return the data cover maximum portion without blanks on the image.

@@ -1,13 +1,12 @@
+# pylint: disable = W0601, W0621
 import argparse
-from math import *
-from random import *
 import numpy as np
 from pathlib import Path
 import os
 CWD = Path(os.getcwd())
 
 
-def cluster(filename, clusters = 3, iteration = 10):
+def cluster(filename, clusters=3, iteration=10):
     """ Numpy type kmeans file.
 
     Parameters
@@ -35,11 +34,11 @@ def cluster(filename, clusters = 3, iteration = 10):
     # Test to check file is in the same folder
     file_path = Path(CWD/f'{filename}')
     if not file_path.is_file():
-        raise FileNotFoundError(f"File '{filename}' could not be found")    
+        raise FileNotFoundError(f"File '{filename}' could not be found")
 
-    if type(clusters) is not int:
+    if not isinstance(clusters, int):
         raise TypeError("Clusters must be an int")
-    if type(iteration) is not int:
+    if not isinstance(iteration, int):
         raise TypeError("Iteration must be an int")
 
     # read csv and return the points coords
@@ -67,7 +66,6 @@ def classify_points(points, alloc, clusters):
 
     classify = []
     for g in range(clusters):
-        arr_index[np.where(arr_index[:, 0] == 0), 1:][0]
         classify.append(arr_index[np.where(arr_index[:, 0] == g), 1:][0])
 
     return classify
@@ -88,21 +86,21 @@ if __name__ == "__main__":
 
     Lclustring_point = cluster(args.file_path, args.clusters, args.iters)
 
-    if args.showclusters == True:
+    if args.showclusters is True:
         g = 0
         for p in Lclustring_point:
-            print("Cluster " + str(g) + " is centred at " + str(centers[g,:])
+            print("Cluster " + str(g) + " is centred at " + str(centers[g, :])
                   + " and has " + str(len(p)) + " points.")
             print(p)
             g += 1
     else:
         g = 0
         for p in Lclustring_point:
-            print("Cluster " + str(g) + " is centred at " + str(centers[g,:])
+            print("Cluster " + str(g) + " is centred at " + str(centers[g, :])
                   + " and has " + str(len(p)) + " points.")
             g += 1
 
-    if args.plotclusters == True:
+    if args.plotclusters is True:
         from matplotlib import pyplot as plt
 
         fig = plt.figure()

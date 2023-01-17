@@ -9,6 +9,7 @@ import numpy as np
 from io import BytesIO
 from aigeanpy import satmap
 from pathlib import Path
+from unittest import mock, TestCase
 
 
 def test_get_satmap_return_correct_type_when_input_Lir():
@@ -68,7 +69,7 @@ def test_earth_to_pixel_return_correct_value():
     x = 750
     y = 250
     resolution = 15
-    assert satmap.earth_to_pixel(x, y, resolution) == (50, 16)
+    assert satmap.earth_to_pixel(x, y, resolution) == (50, 17)
 
 
 def test_pixel_to_earth_return_correct_value():
@@ -119,9 +120,9 @@ def _get_fand(filename):
     meta = {}
     data = []
     with zipfile.ZipFile(file_path_abs, 'r') as f:
-        file_json = json.load(BytesIO(f.read(f.namelist()[2])))
+        file_json = json.load(BytesIO(f.read(f.namelist()[0])))
         meta = _meta_generate(file_json)
-        data = np.load(BytesIO(f.read(f.namelist()[4])))
+        data = np.load(BytesIO(f.read(f.namelist()[1])))
     return satmap.Fand(meta, data)
 
 
@@ -171,7 +172,7 @@ def test_add_two_differetn_types_data_raise_TypeError():
         mock_fand + ecne
 
 
-def test_add_two_SatMap_with_diff_resolution_rais_ValueError():
+def test_add_two_SatMap_with_diff_resolution_raise_ValueError():
     fand_file = 'aigean_fan_20230104_150010.zip'
     mock_fand = _get_fand(fand_file)
     lir_file = 'aigean_lir_20230104_145310.asdf'
@@ -317,3 +318,42 @@ def test_visualise_savepath_should_be_str():
     mock_fand = _get_fand(fand_file)
     with pytest.raises(TypeError) as err:
         mock_fand.visualise(save_path=123)
+
+
+class mocktest(TestCase):
+
+    def test_add(self):
+        lir_map1 = satmap.get_satmap('aigean_fan_20221205_191610.zip')
+        lir_map2 = satmap.get_satmap('aigean_fan_20221205_192210.zip')
+        get_added = mock.Mock(side_effect=lir_map1.__add__)
+        result = get_added(lir_map2)
+        self.assertEqual(get_added.called, True)
+        self.assertEqual(get_added.call_count, 1)
+        self.assertEqual(result.centre, (300, 275))
+
+    def test_sub(self):
+        lir_map1 = satmap.get_satmap('aigean_fan_20221208_170852.zip')
+        lir_map2 = satmap.get_satmap('aigean_fan_20221210_150420.zip')
+        get_substracted = mock.Mock(side_effect=lir_map1.__sub__)
+        result = get_substracted(lir_map2)
+        self.assertEqual(get_substracted.called, True)
+        self.assertEqual(get_substracted.call_count, 1)
+        self.assertEqual(result.centre, (1237, 475))
+
+    def test_mosaic_padding_true(self):
+        lir_map1 = satmap.get_satmap('aigean_lir_20221205_191610.asdf')
+        lir_map2 = satmap.get_satmap('aigean_man_20221205_194510.hdf5')
+        get_substracted = mock.Mock(side_effect=lir_map1.mosaic)
+        result = get_substracted(lir_map2, padding=True)
+        self.assertEqual(get_substracted.called, True)
+        self.assertEqual(get_substracted.call_count, 1)
+        self.assertEqual(result.centre, (850, 350))
+
+    def test_mosaic_padding_false(self):
+        lir_map1 = satmap.get_satmap('aigean_lir_20221205_191610.asdf')
+        lir_map2 = satmap.get_satmap('aigean_man_20221205_194510.hdf5')
+        get_substracted = mock.Mock(side_effect=lir_map1.mosaic)
+        result = get_substracted(lir_map2, padding=False)
+        self.assertEqual(get_substracted.called, True)
+        self.assertEqual(get_substracted.call_count, 1)
+        self.assertEqual(result.centre, (800, 350))

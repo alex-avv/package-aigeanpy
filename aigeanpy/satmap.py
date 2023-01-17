@@ -783,7 +783,7 @@ class SatMap:
         setmap.extra = True
         return setmap
 
-    def visualise(self, save=False, save_path=''):
+    def visualise(self, save=False, save_path=''):  # pylint: disable = R1710
         """ Visualise the data.
 
         Parameters
@@ -792,7 +792,7 @@ class SatMap:
             Choose plot the figure or show the figure, by default False.
         save_path : str, optional
             The path figure saved, by default ''.
-            
+
         Returns
         -------
         filename: str
@@ -824,8 +824,7 @@ class SatMap:
         if save:
             plt.savefig(os.path.join(save_path, filename))
             return filename
-        else:
-            plt.show()
+        plt.show()
 
 
 class Lir(SatMap):

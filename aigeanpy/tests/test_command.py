@@ -1,23 +1,25 @@
-# Disabling missing-function-docstring error
-# pylint: disable = C0116
-from pathlib import Path; import os; 
-CWD = Path(os.getcwd()); TEST_DIR = Path(__file__).parent
-import yaml, json
-from pytest import mark, raises
-import subprocess
+# Disabling missing-module-docstring and missing-function-docstring error
+# pylint: disable = C0114, C0116
+import json
+from pathlib import Path
+import os
+import subprocess  # pylint: disable = W0611
 from subprocess import check_output, STDOUT, CalledProcessError
 import sys
+from pytest import mark
+import yaml
 import numpy as np
 from aigeanpy.satmap import get_satmap
 from aigeanpy.command import unordered_mosaic, output_info, get_latest_obs
-
+CWD = Path(os.getcwd())
+TEST_DIR = Path(__file__).parent
 
 with open(TEST_DIR/'fixtures/fixture_command.yml', 'r',
           encoding="utf-8") as yml_fixtures:
     fixtures = yaml.safe_load(yml_fixtures)
 
 
-#~~~ AIGEAN_TODAY TESTS ~~~#
+# ~~~ AIGEAN_TODAY TESTS ~~~
 # Mocking aigeanpy.net.query_isa function requiring internet connection.
 # With Aigean observations from the 13/Jan/2023
 def query_isa(instrument = ''):
@@ -49,7 +51,6 @@ def test_today_arguments(test_name):
         check_output(parameters, stderr=STDOUT)
     except CalledProcessError as exception:
         assert exception.output.decode("utf-8") == expected_err_message
-        pass
 
 
 @mark.parametrize('test_name', fixtures['get_latest_obs'])
@@ -62,7 +63,7 @@ def test_get_latest_obs(test_name):
     assert latest_obs['filename'] == expected_filename
 
 
-#~~~ AIGEAN_METADATA TESTS ~~~#
+# ~~~ AIGEAN_METADATA TESTS ~~~
 # Mocking aigeanpy.satmap.get_satmap function which requires to open files. 
 # Returns 'SatMap' object with only-defined meta member variable.
 # With Aigean observations from the 05/Dec/2022 to the 20/Dec/2022
@@ -78,13 +79,13 @@ def get_satmap_mock(filename):
         if key not in ['archive', 'instrument', 'observatory', 'resolution',
                        'xcoords', 'ycoords', 'obs_date']:
             raise TypeError
-        elif f'{key}' == 'xcoords':
+        if f'{key}' == 'xcoords':
             meta['xcoords'] = tuple(meta['xcoords'])
         elif f'{key}' == 'ycoords':
             meta['ycoords'] = tuple(meta['ycoords'])   
 
     # Defining mock class
-    class MockClass:
+    class MockClass:  # pylint: disable = C0115, R0903
         def __init__(self, meta):
             self.meta = meta
 
@@ -123,7 +124,7 @@ def test_metadata(capsys, test_name):
     assert output_print == expected_print   
 
 
-#~~~ AIGEAN_MOSAIC TESTS ~~~#
+# ~~~ AIGEAN_MOSAIC TESTS ~~~
 def test_unordered_mosaic():
     lir_map_1 = get_satmap('aigean_lir_20230104_145310.asdf')
     lir_map_2 = get_satmap('extra_aigean_files/'

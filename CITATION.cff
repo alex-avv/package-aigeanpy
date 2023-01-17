@@ -29,7 +29,7 @@ abstract: >-
   satellite data from the Irish Space Agency webservice
   archive.
 license: GNU GENERAL PUBLIC LICENSE
-version: '1.0'
+version: '0.1.0'
 dependencies:
   alabaster==0.7.13
   asdf==2.14.3

@@ -61,7 +61,7 @@ The second, save_dir, is an optional parameter (but must be a string) that speci
 
 An example download_isa use case would be the following:
 
-    download_isa("{queriedfile}.{instrumentext}", "C:\\{foldertosaveto}\\")
+    download_isa("aigean_lir_20230104_145310.asdf", "C:/{foldertosaveto}/")
 
 Where queriedfile represents the name of the file in the database, the instrumentext represents the instrument type to be parsed (asdf, hdf5, zip),
 and the foldertosaveto represents the path to the locally saved file.

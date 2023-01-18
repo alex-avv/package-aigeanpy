@@ -4,7 +4,6 @@ import argparse
 from math import sqrt
 from random import randrange
 from pathlib import Path
-DIR = Path(__file__).parent
 
 
 class Tool4Kmeans:
@@ -80,9 +79,12 @@ def cluster(filename, clusters, iterations):
     """
 
     # Test to check file is in the same folder
-    file_path = Path(DIR/f'{filename}')
+    file_org_name = filename
+    if filename[0] == '/':
+        filename = filename[1:]
+    file_path = Path(filename)
     if not file_path.is_file():
-        raise FileNotFoundError(f"File '{filename}' could not be found")
+        raise FileNotFoundError(f"File '{file_org_name}' could not be found")
 
     if not isinstance(clusters, int):
         raise TypeError("Clusters must be an int")

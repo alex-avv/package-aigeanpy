@@ -2,7 +2,6 @@
 import argparse
 import numpy as np
 from pathlib import Path
-DIR = Path(__file__).parent
 
 
 def cluster(filename, clusters=3, iteration=10):
@@ -31,9 +30,12 @@ def cluster(filename, clusters=3, iteration=10):
         global centers
 
     # Test to check file is in the same folder
-    file_path = Path(DIR/f'{filename}')
+    file_org_name = filename
+    if filename[0] == '/':
+        filename = filename[1:]
+    file_path = Path(filename)
     if not file_path.is_file():
-        raise FileNotFoundError(f"File '{filename}' could not be found")
+        raise FileNotFoundError(f"File '{file_org_name}' could not be found")
 
     if not isinstance(clusters, int):
         raise TypeError("Clusters must be an int")
@@ -41,7 +43,7 @@ def cluster(filename, clusters=3, iteration=10):
         raise TypeError("Iteration must be an int")
 
     # read csv and return the points coords
-    samples = np.loadtxt(filename, delimiter=",")
+    samples = np.loadtxt(file_path, delimiter=",")
     # random select center
     centers = samples[np.random.choice(samples.shape[0], size=clusters,
                                        replace=False)]

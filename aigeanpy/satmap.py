@@ -183,6 +183,8 @@ class SatMapFactory():
         data = []
         file_path_abs = None
         try:
+            if filename[0] == '/':
+                filename = filename[1:]
             file_path_abs = sorted(Path().rglob(filename))[0]
         except IndexError as e:
             raise ValueError("No matching file can be found")

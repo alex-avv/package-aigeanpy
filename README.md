@@ -87,8 +87,6 @@ This page is a guide for those developers who want to contribute to the Aigeanpy
 
 5.  Move into the aigeanpy directory and run pytest in the terminal.
 
-    .. code-block:: Python
-
         pytest
 
 6.  Push your branch to your fork on Github. When creating commit messages please follow the style guide (https://medium.com/swlh/writing-better-commit-messages-9b0b6ff60c67).
